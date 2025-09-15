@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Error</title>
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+    <h1 class="error">Error</h1>
+    <% if (typeof message !== 'undefined') { %>
+        <h2><%= message %></h2>
+    <% } else { %>
+        <h2>Something went wrong</h2>
+    <% } %>
+    
+    <% if (typeof error !== 'undefined' && error.status) { %>
+        <p>Status: <%= error.status %></p>
+    <% } %>
+    
+    <% if (typeof error !== 'undefined' && error.stack && process.env.NODE_ENV !== 'production') { %>
+        <pre><%= error.stack %></pre>
+    <% } %>
+</body>
+</html>

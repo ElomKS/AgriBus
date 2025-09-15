@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commande</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/checkout.css">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<%- include('../partials/header.ejs') %>
+<body>
+  <!-- Header -->
+  <header class="p-3 text-bg-dark">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+          <svg class="bi me-2" width="35" height="32" role="img" aria-label="Bootstrap">
+            <use xlink:href="#bootstrap"></use>
+          </svg>
+        </a>
+        
+      </div>
+    </div>
+  </header>
+
+  <main class="container my-5">
+    <!-- Progress Indicator -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="progress-steps d-flex justify-content-center">
+          <div class="step completed">
+            <div class="step-circle">
+              <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="step-label">Panier</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step active">
+            <div class="step-circle">
+              <i class="fas fa-credit-card"></i>
+            </div>
+            <div class="step-label">Commande</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step">
+            <div class="step-circle">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="step-label">Confirmation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Checkout Form -->
+      <div class="col-lg-7">
+        <div class="card">
+          <div class="card-header bg-success text-white">
+            <h3 class="card-title mb-0">
+              <i class="fas fa-user me-2"></i>Informations de livraison
+            </h3>
+          </div>
+          <div class="card-body">
+            <form id="checkoutForm" action="/checkout" method="POST">
+              <!-- Customer Information -->
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="firstName" class="form-label">Prénom *</label>
+                  <input type="text" class="form-control" id="firstName" name="firstName" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="lastName" class="form-label">Nom *</label>
+                  <input type="text" class="form-control" id="lastName" name="lastName" required>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label">Email *</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+              </div>
+
+              <div class="mb-3">
+                <label for="phone" class="form-label">Téléphone *</label>
+                <input type="tel" class="form-control" id="phone" name="phone" required>
+              </div>
+
+              <!-- Delivery Address -->
+              <h5 class="mt-4 mb-3 text-success">
+                <i class="fas fa-map-marker-alt me-2"></i>Adresse de livraison
+              </h5>
+
+              <div class="mb-3">
+                <label for="address" class="form-label">Adresse *</label>
+                <input type="text" class="form-control" id="address" name="address" required>
+              </div>
+
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label for="zipCode" class="form-label">Code postal *</label>
+                  <input type="text" class="form-control" id="zipCode" name="zipCode" required>
+                </div>
+                <div class="col-md-8 mb-3">
+                  <label for="city" class="form-label">Ville *</label>
+                  <input type="text" class="form-control" id="city" name="city" required>
+                </div>
+              </div>
+
+              <!-- Delivery Options -->
+              <h5 class="mt-4 mb-3 text-success">
+                <i class="fas fa-truck me-2"></i>Mode de livraison
+              </h5>
+
+              <div class="mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="deliveryMethod" id="homeDelivery" value="home" checked>
+                  <label class="form-check-label" for="homeDelivery">
+                    <strong>Livraison à domicile</strong> (Gratuite pour commandes > 30€)
+                    <br>
+                    <small class="text-muted">Délai : 24-48h dans un rayon de 20km</small>
+                  </label>
+                </div>
+                <div class="form-check mt-2">
+                  <input class="form-check-input" type="radio" name="deliveryMethod" id="pickup" value="pickup">
+                  <label class="form-check-label" for="pickup">
+                    <strong>Retrait à la ferme</strong> (Gratuit)
+                    <br>
+                    <small class="text-muted">123 Chemin de la Ferme, 12345 Campagne-sur-Mer</small>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Payment Method -->
+              <h5 class="mt-4 mb-3 text-success">
+                <i class="fas fa-credit-card me-2"></i>Mode de paiement
+              </h5>
+
+              <div class="mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="paymentMethod" id="cardPayment" value="card" checked>
+                  <label class="form-check-label" for="cardPayment">
+                    <i class="fas fa-credit-card me-2"></i>Carte bancaire
+                  </label>
+                </div>
+                <div class="form-check mt-2">
+                  <input class="form-check-input" type="radio" name="paymentMethod" id="cashPayment" value="cash">
+                  <label class="form-check-label" for="cashPayment">
+                    <i class="fas fa-money-bill-wave me-2"></i>Paiement à la livraison/retrait
+                  </label>
+                </div>
+              </div>
+
+              <!-- Special Instructions -->
+              <div class="mb-3">
+                <label for="instructions" class="form-label">Instructions spéciales (optionnel)</label>
+                <textarea class="form-control" id="instructions" name="instructions" rows="3" 
+                  placeholder="Indiquez ici toute instruction particulière pour la livraison..."></textarea>
+              </div>
+
+              <!-- Terms and Conditions -->
+              <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="acceptTerms" name="acceptTerms" required>
+                <label class="form-check-label" for="acceptTerms">
+                  J'accepte les <a href="/terms" target="_blank">conditions générales de vente</a> *
+                </label>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="col-lg-5">
+        <div class="card">
+          <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-receipt me-2"></i>Récapitulatif de commande
+            </h5>
+          </div>
+          <div class="card-body">
+            <% if (basket && basket.length > 0) { %>
+              <!-- Order Items -->
+              <div class="order-items mb-4">
+                <% basket.forEach(function(item) { %>
+                  <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                    <img src="<%= item.image %>" alt="<%= item.nom %>" class="rounded me-3" width="50" height="50" style="object-fit: cover;">
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1"><%= item.nom %></h6>
+                      <small class="text-muted">Quantité: <%= item.quantity %></small>
+                    </div>
+                    <div class="text-end">
+                      <span class="fw-bold"><%= (item.prix * item.quantity).toFixed(2) %> €</span>
+                    </div>
+                  </div>
+                <% }); %>
+              </div>
+
+              <!-- Pricing Details -->
+              <div class="pricing-details">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Sous-total :</span>
+                  <span><%= cartTotals.subtotal.toFixed(2) %> $</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>TVA (10%) :</span>
+                  <span><%= cartTotals.tax.toFixed(2) %> $</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2" id="deliveryFee">
+                  <span>Livraison :</span>
+                  <span class="text-success">Free</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between fw-bold text-success fs-5 mb-4">
+                  <span>Total :</span>
+                  <span><%= cartTotals.total.toFixed(2) %> $</span>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="d-grid gap-2">
+                <button type="submit" form="checkoutForm" class="btn btn-success btn-lg">
+                  <i class="fas fa-lock me-2"></i>Confirmer la commande
+                </button>
+                <a href="/panier" class="btn btn-outline-secondary">
+                  <i class="fas fa-arrow-left me-1"></i>Retour au panier
+                </a>
+              </div>
+
+              <!-- Security Notice -->
+              <div class="text-center mt-3">
+                <small class="text-muted">
+                  <i class="fas fa-shield-alt me-1"></i>
+                  Vos données sont sécurisées et protégées
+                </small>
+              </div>
+            <% } else { %>
+              <div class="text-center py-4">
+                <p class="text-muted">Votre panier est vide</p>
+                <a href="/acheter" class="btn btn-success">
+                  <i class="fas fa-leaf me-1"></i>Voir nos produits
+                </a>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  
+       <%- include('../partials/footer.ejs') %>
+ 
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

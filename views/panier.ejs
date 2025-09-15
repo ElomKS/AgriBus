@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <%= title %> - Ferme Bio
+  </title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<%- include('../partials/header.ejs') %>
+<body>
+
+  <main class="container my-5">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-header bg-success text-white">
+            <h2 class="card-title mb-0">
+              <i class="fas fa-shopping-cart me-2"></i>Votre Panier
+            </h2>
+          </div>
+          <div class="card-body">
+            <% if (basket && basket.length> 0) { %>
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>produit</th>
+                      <th>Prix unitaire</th>
+                      <th>Quantité</th>
+                      <th>Total</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% basket.forEach(function(item) { %>
+                      <tr>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <img src="<%= item.image %>" alt="<%= item.nom %>" class="me-3 rounded" width="60"
+                              height="60" style="object-fit: cover;">
+                            <div>
+                              <h6 class="mb-0">
+                                <%= item.nom %>
+                              </h6>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="fw-bold">
+                          <%= item.prix.toFixed(2) %> $
+                        </td>
+                        <form action="/panier/add" method="POST" class="d-flex align-items-center">
+                          <input type="hidden" name="productId" value="<%= item.id %>">
+                          <!-- <div class="input-group me-2" style="width: 120px;">
+                            <button class="btn btn-outline-secondary btn-sm" type="button"
+                              onclick="decreaseQuantity(this)">-</button>
+                            <input type="number" name="quantity" class="form-control form-control-sm text-center"
+                              value="1" min="1">
+                            <button class="btn btn-outline-secondary btn-sm" type="button"
+                              onclick="increaseQuantity(this)">+</button>
+                          </div> -->
+                          
+                        </form>
+
+                        <td>
+                          <form action="/panier/update" method="POST" class="d-flex align-items-center">
+                            <input type="hidden" name="productId" value="<%= item.id %>">
+                            <div class="input-group" style="width: 120px;">
+                              <button type="button" class="btn btn-outline-secondary btn-sm" 
+                                onclick="updateQuantity(this, -1)">-</button>
+                              <input type="number" class="form-control form-control-sm text-center" 
+                                name="quantity" value="<%= item.quantity %>" min="1" 
+                                onchange="submitForm(this)">
+                              <button type="button" class="btn btn-outline-secondary btn-sm" 
+                                onclick="updateQuantity(this, 1)">+</button>
+                            </div>
+                          </form>
+                        </td>
+                        <td class="fw-bold text-success">
+                          <%= (item.prix * item.quantity).toFixed(2) %> $
+                        </td>
+                        <td>
+                          <form action="/panier/remove" method="POST" class="d-inline">
+                            <input type="hidden" name="productId" value="<%= item.id %>">
+                            <button type="submit" class="btn btn-outline-danger btn-sm"
+                              onclick="return confirm('Supprimer cet article ?')">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                          </form>
+                        </td>
+                      </tr>
+                      <% }); %>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mt-4">
+                <form action="/panier/clear" method="POST" class="d-inline">
+                  <button type="submit" class="btn btn-outline-warning"
+                    onclick="return confirm('Vider complètement le panier ?')">
+                    <i class="fas fa-broom me-1"></i>Vider le panier
+                  </button>
+                </form>
+
+                <div class="text-end">
+                  <a href="/acheter" class="btn btn-outline-success me-2">
+                    <i class="fas fa-arrow-left me-1"></i>Continuer les achats
+                  </a>
+                </div>
+              </div>
+              <% } else { %>
+                <div class="text-center py-5">
+                  <i class="fas fa-shopping-cart text-muted" style="font-size: 4rem;"></i>
+                  <h4 class="mt-3 text-muted">Votre panier est vide</h4>
+                  <p class="text-muted">Découvrez nos délicieux produits de la ferme</p>
+                  <a href="/acheter" class="btn btn-success">
+                    <i class="fas fa-leaf me-1"></i>Voir nos produits
+                  </a>
+                </div>
+                <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary Sidebar -->
+      <div class="col-lg-4">
+        <% if (basket && basket.length> 0) { %>
+          <div class="card">
+            <div class="card-header bg-light">
+              <h5 class="card-title mb-0">Récapitulatif de commande</h5>
+            </div>
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-2">
+                <span>Sous-total :</span>
+                <span>
+                  <%= cartTotals.subtotal.toFixed(2) %> $
+                </span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span>TVA (10%) :</span>
+                <span>
+                  <%= cartTotals.tax.toFixed(2) %> $
+                </span>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between fw-bold text-success fs-5">
+                <span>Total :</span>
+                <span>
+                  <%= cartTotals.total.toFixed(2) %> $
+                </span>
+              </div>
+
+              <div class="d-grid mt-4">
+                <a href="/checkout" class="btn btn-success btn-lg">
+                  <i class="fas fa-credit-card me-1"></i>Passer commande
+                </a>
+              </div>
+
+              <div class="mt-3 text-center">
+                <small class="text-muted">
+                  <i class="fas fa-shield-alt me-1"></i>Paiement sécurisé
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delivery Info -->
+         
+          <% } %>
+      </div>
+    </div>
+  </main>
+
+  
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+
+  <script>
+    function updateQuantity(button, change) {
+        const form = button.closest('form');
+        const input = form.querySelector('input[name="quantity"]');
+        const currentValue = parseInt(input.value);
+        const newValue = Math.max(1, currentValue + change);
+        input.value = newValue;
+        submitForm(input);
+    }
+
+    function submitForm(element) {
+        const form = element.closest('form');
+        if (form) {
+            form.submit();
+        }
+    }
+  </script>
+   <%- include('../partials/footer.ejs') %>
+</body>
+
+</html>

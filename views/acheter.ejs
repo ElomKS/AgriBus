@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>achat</title>
+</head>
+<%- include('../partials/header.ejs') %>
+
+    <body>
+        <div class="container">
+            <div class="px-4 py-2 my-2 text-center">
+                <% if (locals.items && locals.items.length> 0) { %>
+                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                        <% locals.items.forEach(function(item, index) { %>
+                            <div class="col">
+                                <div class="card">
+                                    <img src="<%= item.image %>" class="card-img-top" alt="<%= item.nom %> "
+                                        width="200" height="250">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <%= item.nom %>
+                                        </h5>
+                                        <p class="card-text">Prix: <%= item.prix %> $</p>
+                                        <form action="/panier/add" method="POST">
+                                            <input type="hidden" name="productId" value="<%= item.id %>">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="btn btn-primary">Ajouter au panier</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }); %>
+                    </div>
+                    <% } else { %>
+                        <p>Aucun produit disponible pour le moment.</p>
+                        <% } %>
+            </div>
+        </div>
+        <%- include('../partials/footer.ejs') %>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-1n4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4"
+                crossorigin="anonymous"></script>
+    </body>
+
+</html>
