@@ -12,8 +12,8 @@
   <link rel="stylesheet" href="/styles/checkout.css">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
-<%- include('../partials/header.ejs') %>
 <body>
+  <%- include('../partials/header.ejs') %>
   <!-- Header -->
   <header class="p-3 text-bg-dark">
     <div class="container">
@@ -28,7 +28,7 @@
     </div>
   </header>
 
-  <main class="container my-5">
+  <main class="content-wrapper container my-5">
     <!-- Progress Indicator -->
     <div class="row mb-4">
       <div class="col-12">
@@ -120,7 +120,7 @@
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="deliveryMethod" id="homeDelivery" value="home" checked>
                   <label class="form-check-label" for="homeDelivery">
-                    <strong>Livraison à domicile</strong> (Gratuite pour commandes > 30€)
+                    <strong>Livraison à domicile</strong> (Gratuite pour commandes > 30 CFA)
                     <br>
                     <small class="text-muted">Délai : 24-48h dans un rayon de 20km</small>
                   </label>
@@ -194,7 +194,7 @@
                       <small class="text-muted">Quantité: <%= item.quantity %></small>
                     </div>
                     <div class="text-end">
-                      <span class="fw-bold"><%= (item.prix * item.quantity).toFixed(2) %> €</span>
+                      <span class="fw-bold"><%= (item.prix * item.quantity).toFixed(2) %> CFA</span>
                     </div>
                   </div>
                 <% }); %>
@@ -204,20 +204,20 @@
               <div class="pricing-details">
                 <div class="d-flex justify-content-between mb-2">
                   <span>Sous-total :</span>
-                  <span><%= cartTotals.subtotal.toFixed(2) %> $</span>
+                  <span><%= cartTotals.subtotal.toFixed(2) %> CFA</span>
                 </div>
                 <div class="d-flex justify-content-between mb-2">
                   <span>TVA (10%) :</span>
-                  <span><%= cartTotals.tax.toFixed(2) %> $</span>
+                  <span><%= cartTotals.tax.toFixed(2) %> CFA</span>
                 </div>
                 <div class="d-flex justify-content-between mb-2" id="deliveryFee">
                   <span>Livraison :</span>
-                  <span class="text-success">Free</span>
+                  <span class="text-success">Gratuite</span>
                 </div>
                 <hr>
                 <div class="d-flex justify-content-between fw-bold text-success fs-5 mb-4">
                   <span>Total :</span>
-                  <span><%= cartTotals.total.toFixed(2) %> $</span>
+                  <span><%= cartTotals.total.toFixed(2) %> CFA</span>
                 </div>
               </div>
 
@@ -251,9 +251,7 @@
       </div>
     </div>
   </main>
-
-  
-       <%- include('../partials/footer.ejs') %>
+  <%- include('../partials/footer.ejs') %>
  
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"

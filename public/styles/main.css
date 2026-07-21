@@ -4,13 +4,45 @@
   color: black !important; /* Optional: for better contrast */
 }
 /* Global Styles */
+html, body {
+    height: 100%;
+}
+
 body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f0f2f5;  /* Light gray background */
     /* Or you can use a gradient */
     /* background: linear-gradient(to bottom, #ffffff, #f0f2f5); */
+}
+
+main,
+body > .container,
+body > .content-wrapper,
+body > .page-content {
+    flex: 1;
+}
+
+footer {
+    margin-top: auto;
+    width: 100%;
+}
+
+.footer-social-icon {
+    display: inline-block;
+    margin: 0 0.35rem;
+    font-size: 1.1rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.footer-social-icon:hover {
+    color: #ffc107;
+    transform: translateY(-1px);
+    text-decoration: none;
 }
 
 /* Error Page Styles */

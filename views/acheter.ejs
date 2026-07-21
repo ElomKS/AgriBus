@@ -6,13 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/main.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <title>achat</title>
 </head>
-<%- include('../partials/header.ejs') %>
+<body>
+    <%- include('../partials/header.ejs') %>
 
-    <body>
+    <main class="content-wrapper">
         <div class="container">
             <div class="px-4 py-2 my-2 text-center">
                 <% if (locals.items && locals.items.length> 0) { %>
@@ -26,7 +28,7 @@
                                         <h5 class="card-title">
                                             <%= item.nom %>
                                         </h5>
-                                        <p class="card-text">Prix: <%= item.prix %> $</p>
+                                        <p class="card-text">Prix: <%= item.prix %> CFA</p>
                                         <form action="/panier/add" method="POST">
                                             <input type="hidden" name="productId" value="<%= item.id %>">
                                             <input type="hidden" name="quantity" value="1">
@@ -42,10 +44,12 @@
                         <% } %>
             </div>
         </div>
-        <%- include('../partials/footer.ejs') %>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-                integrity="sha384-1n4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4"
-                crossorigin="anonymous"></script>
-    </body>
+    </main>
+
+    <%- include('../partials/footer.ejs') %>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-1n4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4"
+        crossorigin="anonymous"></script>
+</body>
 
 </html>
