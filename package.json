@@ -1,0 +1,26 @@
+{
+  "name": "agribus",
+  "version": "1.0.0",
+  "description": "Application de boutique en ligne pour produits fermiers avec panier et commande en CFA",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElomKS/AgriBus.git"
+  },
+  "author": "Florent",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ElomKS/AgriBus/issues"
+  },
+  "homepage": "https://github.com/ElomKS/AgriBus#readme",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "nodemon": "^3.1.10"
+  }
+}

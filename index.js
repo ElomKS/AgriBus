@@ -1,60 +1,3 @@
-// import express from 'express';
-// import session from 'express-session';
-// const app = express();
-
-// app.set('view engine', 'ejs');
-// app.use(express.static('public'));
-// app.use(express.urlencoded({ extended: true })); // Add this line to parse form data
-// app.use(session({
-//     secret: 'your-secret-key',
-//     resave: false,
-//     saveUninitialized: true
-// }));
-
-//  const produits = [
-//         { nom: 'Laitues', prix: 0, image: "./images/laitue.jpg" },
-//         { nom: 'Tomates', prix: 0, image: "./images/tomatoes fruits.png" },
-//         { nom: 'Beetroot', prix: 0, image: "./images/Beetroot.png" },
-//         { nom: 'Concombre', prix: 0, image: "./images/concombre.png" },
-//         { nom: 'Oignons', prix: 0, image: "./images/onion.png" },
-//         { nom: 'Carottes', prix: 0, image: "./images/carrot.png" },
-//         { nom: 'Poissons', prix: 0, image: "./images/porgy.png" },
-//         { nom: 'Poulets', prix: 0, image: "./images/chicken.png" },
-//         { nom: 'Oeufs', prix: 0, image: "./images/eggs.png" }
-//     ];
-
-// app.get('/', (req, res) => {
-//     res.render('index', { title: 'Home Page' });
-// });
-
-// app.get('/produits', (req, res) => {
-//     res.render('produits', { title: 'Products Page', produits: produits });
-// });
-
-// app.get('/histoire', (req, res) => {
-//     res.render('histoire', { title: 'Histoire Page' });
-// });
-
-// app.get('/acheter', (req, res) => {
-//         res.render('acheter', { title: 'Achat Page', produits: produits });
-// });
-
-// app.get('/panier', (req, res) => {
-//     const basket = req.session.basket || [];
-//     res.render('panier', { title: 'Panier Page', basket: basket });
-// });
-
-// app.post('/panier', (req, res) => {
-//     const index = req.body.index;
-//     if (!req.session.basket) req.session.basket = [];
-//     req.session.basket.push(produits[index]);
-//     res.redirect('/panier');
-// });
-
-
-// app.listen(3000, () => {
-//     console.log('Server is running on http://localhost:3000');
-// });
 
 // Enhanced index.js with proper pricing and cart functionality
 import express from 'express';
@@ -80,10 +23,10 @@ const items = [
     { id: 3, nom: 'Betteraves', prix: 4.25, image: "./images/Beetroot.png", description: "Betteraves rouges fraîches", stock: 20 },
     { id: 4, nom: 'Concombres', prix: 2.80, image: "./images/cucumbers.png", description: "Concombres croquants", stock: 15 },
     { id: 5, nom: 'Oignons', prix: 3.20, image: "./images/onion.png", description: "Oignons parfumés de notre terre", stock: 40 },
-    { id: 6, nom: 'Carottes', prix: 3.75, image: "./images/carrot.png", description: "Carottes douces et nutritives", stock: 35 },
-    { id: 7, nom: 'Poissons', prix: 12.50, image: "./images/porgy.png", description: "Poissons frais d'élevage durable", stock: 8 },
-    { id: 8, nom: 'Poulets', prix: 15.00, image: "./images/chicken.png", description: "Poulets fermiers élevés au grain", stock: 5 },
-    { id: 9, nom: 'Œufs', prix: 6.25, image: "./images/eggs.png", description: "Œufs frais de nos poules élevées au sol", stock: 50 }
+    { id: 6, nom: 'Carottes', prix: 3.75, image: "./images/carrotte1.jpeg", description: "Carottes douces et nutritives", stock: 35 },
+    { id: 7, nom: 'Poissons', prix: 12.50, image: "./images/tilapia.jpg", description: "Poissons frais d'élevage durable", stock: 8 },
+    { id: 8, nom: 'Poulets', prix: 15.00, image: "./images/volailes.jpg", description: "Poulets fermiers élevés au grain", stock: 5 },
+    { id: 9, nom: 'Œufs', prix: 6.25, image: "./images/oeuf.jpg", description: "Œufs frais de nos poules élevées au sol", stock: 50 }
 ];
 
 // Helper function to initialize cart
