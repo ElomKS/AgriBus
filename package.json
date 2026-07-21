@@ -1,7 +1,7 @@
 {
   "name": "agribus",
   "version": "1.0.0",
-  "description": "farm product selling app",
+  "description": "Application de boutique en ligne pour produits fermiers avec panier et commande en CFA",
   "main": "index.js",
   "type": "module",
   "scripts": {
