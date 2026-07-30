@@ -1,2 +1,10 @@
 .env
 node_modules/
+
+# Local SQLite database files
+agribus.db
+agribus.db-journal
+*.sqbpro
+
+# Local image files not part of the static project
+public/images/pintade.jpg
