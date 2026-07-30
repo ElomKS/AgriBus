@@ -123,6 +123,15 @@ footer {
     color: black !important;
 }
 
+.btn-success {
+    background-color: #2e7d32 !important;
+    border-color: #2e7d32 !important;
+}
+
+.alert-success {
+    border-left: 4px solid #2e7d32;
+}
+
 /* Cart Badge Styles */
 .cart-badge {
     position: relative;

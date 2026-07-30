@@ -20,14 +20,18 @@
           <li class="nav-item">
             <a class="nav-link" href="/acheter">Acheter</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/contact">Contact</a>
+          </li>
         </ul>
         <div class="navbar-nav">
           <a class="nav-link active" href="/panier">
             <i class="fas fa-shopping-cart me-1"></i>
             Panier
-            <% if (typeof cartTotals !=='undefined' && cartTotals.totalItems> 0) { %>
+            <% const badgeCount = typeof cartCount !== 'undefined' ? cartCount : (typeof cartTotals !== 'undefined' ? cartTotals.totalItems : 0); %>
+            <% if (badgeCount > 0) { %>
               <span class="badge bg-warning text-dark">
-                <%= cartTotals.totalItems %>
+                <%= badgeCount %>
               </span>
             <% } %>
           </a>

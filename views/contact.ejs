@@ -10,8 +10,11 @@
 <body>
   <%- include('../partials/header.ejs') %>
   <main class="content-wrapper container mt-5">
-    <h1 class="text-center mb-4">Contact Us</h1>
-    <form action="/send-message" method="POST">
+    <h1 class="text-center mb-4">Contactez-nous</h1>
+    <% if (locals.successMessage) { %>
+      <div class="alert alert-success" role="alert"><%= locals.successMessage %></div>
+    <% } %>
+    <form action="/send-message" method="POST" class="mx-auto" style="max-width: 700px;">
       <div class="mb-3">
         <label for="name" class="form-label">Name:</label>
         <input type="text" class="form-control" id="name" name="name" required>
