@@ -1,56 +1,146 @@
-<!--When clicked on voir nos produits this page should display the list of products available for purchase-->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Histoire</title>
+    <title>Notre Histoire - Kekeli Ferme</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/histoire.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 
 <body>
     <%- include('../partials/header.ejs') %>
+
     <main class="content-wrapper">
-        <div class="px-4 py-2 my-5 text-center">
-            <h2>
-                Découvrez l'histoire de notre ferme et notre engagement envers une agriculture durable
-            </h2>
-            
-            <p>Nichée au cœur de notre région, notre ferme est avant tout une histoire de passion et de respect
-                de la nature. Depuis plusieurs années, nous cultivons avec soin une variété de légumes frais comme
-                la laitue, les oignons, les carottes, les betteraves et les tomates, tout en élevant des poissons,
-                des poules et des poulets dans des conditions saines et naturelles.
-                Chaque récolte, chaque œuf, chaque produit reflète notre engagement envers une agriculture
-                responsable, locale et savoureuse. Nous croyons en la fraîcheur "de la terre à la table", et
-                travaillons chaque jour à offrir à nos clients des aliments nutritifs, cultivés avec amour et livrés
-                avec fierté.</p>
-            <p>Au cœur de la campagne, loin des chaînes industrielles et du rythme effréné de la grande distribution,
-                notre ferme est née d’un rêve simple : reconnecter les gens à une alimentation vraie, saine et
-                respectueuse de la nature.</p>
-            <p>
-                Tout a commencé avec un constat : les saveurs se perdaient, la confiance disparaissait, et la terre
-                souffrait. Alors, nous avons pris une décision. Revenir à l’essentiel. Revenir à la terre.
-                Ici, chaque graine est plantée avec intention, chaque produit est cultivé sans compromis. Nous misons
-                sur une agriculture biologique, inspirée de la permaculture, qui respecte les saisons, la biodiversité
-                et l’équilibre naturel du sol. Aucune chimie, aucun raccourci. Juste la patience, la passion, et une
-                volonté profonde de nourrir autrement.</p>
-            <h2>Notre Mission</h2>
-            <p>Offrir à chacun une alimentation locale, fraîche et pleine de sens. Nourrir les familles
-                tout en nourrissant les écosystèmes qui nous entourent. Car pour nous, bien manger ne devrait jamais se
-                faire aux dépens de la planète.
-                Aujourd’hui, cette ferme est aussi la vôtre. Un lieu d’échange, de partage et de transmission. Ensemble,
-                cultivons l’avenir.
-            </p>
-        </div>
+
+        <!-- HERO -->
+        <section class="story-hero d-flex align-items-center">
+            <div class="container py-5 text-white text-center">
+                <span class="hero-kicker"><i class="fas fa-book-open me-2"></i>Notre Histoire</span>
+                <h1 class="story-title mt-3 mx-auto">Découvrez l'histoire de notre ferme et notre engagement envers
+                    une agriculture durable</h1>
+            </div>
+            <svg class="hero-wave" viewBox="0 0 1440 90" preserveAspectRatio="none">
+                <path fill="#f0f2f5" d="M0,60 C360,110 1080,10 1440,60 L1440,90 L0,90 Z"></path>
+            </svg>
+        </section>
+
+        <!-- UNE HISTOIRE DE PASSION -->
+        <section class="container py-5">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6 order-lg-2">
+                    <div class="story-collage">
+                        <img src="/images/onions.jpg" alt="Oignons de la ferme" class="collage-a">
+                        <img src="/images/oeufs.jpg" alt="Œufs fermiers" class="collage-b">
+                    </div>
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                    <span class="section-kicker">Nos débuts</span>
+                    <h2 class="fw-bold mb-3">Une histoire de passion et de respect de la nature</h2>
+                    <p>Nichée au cœur de notre région, notre ferme est avant tout une histoire de passion et de
+                        respect de la nature. Depuis plusieurs années, nous cultivons avec soin une variété de
+                        légumes frais comme la laitue, les oignons, les carottes, les betteraves et les tomates,
+                        tout en élevant des poissons, des poules et des poulets dans des conditions saines et
+                        naturelles.</p>
+                    <p>Chaque récolte, chaque œuf, chaque produit reflète notre engagement envers une agriculture
+                        responsable, locale et savoureuse. Nous croyons en la fraîcheur "de la terre à la table",
+                        et travaillons chaque jour à offrir à nos clients des aliments nutritifs, cultivés avec
+                        amour et livrés avec fierté.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- LE DECOCLIC -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-6">
+                        <div class="story-collage">
+                            <img src="/images/laitue.jpg" alt="Laitues cultivées bio" class="collage-b">
+                            <img src="/images/silure.jpg" alt="Poissons d'élevage" class="collage-a">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <span class="section-kicker">Le déclic</span>
+                        <h2 class="fw-bold mb-3">Revenir à l'essentiel</h2>
+                        <p>Au cœur de la campagne, loin des chaînes industrielles et du rythme effréné de la grande
+                            distribution, notre ferme est née d'un rêve simple : reconnecter les gens à une
+                            alimentation vraie, saine et respectueuse de la nature.</p>
+                        <p>Tout a commencé avec un constat : les saveurs se perdaient, la confiance disparaissait,
+                            et la terre souffrait. Alors, nous avons pris une décision. Revenir à l'essentiel.
+                            Revenir à la terre.</p>
+                        <p>Ici, chaque graine est plantée avec intention, chaque produit est cultivé sans compromis.
+                            Nous misons sur une agriculture biologique, inspirée de la permaculture, qui respecte
+                            les saisons, la biodiversité et l'équilibre naturel du sol. Aucune chimie, aucun
+                            raccourci. Juste la patience, la passion, et une volonté profonde de nourrir
+                            autrement.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NOS ENGAGEMENTS -->
+        <section class="engagements-band py-5">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <span class="section-kicker">Nos engagements</span>
+                    <h2 class="fw-bold text-white">Ce qui guide chacun de nos gestes</h2>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="engagement-card">
+                            <i class="fas fa-seedling"></i>
+                            <h3>Agriculture biologique</h3>
+                            <p>Inspirée de la permaculture, respectueuse des saisons et de l'équilibre naturel du
+                                sol.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="engagement-card">
+                            <i class="fas fa-dove"></i>
+                            <h3>Zéro compromis</h3>
+                            <p>Aucune chimie, aucun raccourci : seulement la patience, la passion et le goût du
+                                travail bien fait.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="engagement-card">
+                            <i class="fas fa-people-group"></i>
+                            <h3>Transmission</h3>
+                            <p>Un lieu d'échange, de partage et de transmission, pour cultiver ensemble l'avenir.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NOTRE MISSION -->
+        <section class="container py-5">
+            <div class="mission-card mx-auto text-center">
+                <span class="section-kicker">Notre Mission</span>
+                <h2 class="fw-bold mb-3">Offrir à chacun une alimentation locale, fraîche et pleine de sens</h2>
+                <p class="mb-3">Nourrir les familles tout en nourrissant les écosystèmes qui nous entourent. Car
+                    pour nous, bien manger ne devrait jamais se faire aux dépens de la planète.</p>
+                <p class="fst-italic mb-4">Aujourd'hui, cette ferme est aussi la vôtre. Un lieu d'échange, de partage
+                    et de transmission. Ensemble, cultivons l'avenir.</p>
+                <a href="/produits" class="btn btn-success btn-lg rounded-pill px-4">
+                    Découvrir nos produits <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </section>
+
     </main>
+
     <%- include('../partials/footer.ejs') %>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-1n4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4" crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
 </body>
 
 </html>

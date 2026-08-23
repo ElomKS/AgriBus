@@ -158,3 +158,185 @@ footer {
 .card-text {
     color: #666;
 }
+
+/* ============ BOUTIQUE — Cards produits partagées (Produits / Acheter) ============ */
+
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+}
+
+.section-kicker {
+    display: inline-block;
+    color: #2e7d32;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.hero-kicker {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(4px);
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.hero-wave {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 2;
+}
+
+.product-card {
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 14px 30px rgba(46, 125, 50, 0.18);
+}
+
+.product-img-wrap {
+    position: relative;
+    background: #f8f9fa;
+}
+
+.product-img-wrap img {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    padding: 1.25rem;
+    transition: transform 0.35s ease;
+}
+
+.product-card:hover .product-img-wrap img {
+    transform: scale(1.07);
+}
+
+.product-price {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #2e7d32;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    box-shadow: 0 4px 10px rgba(46, 125, 50, 0.35);
+}
+
+.product-body {
+    padding: 1.25rem 1.4rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.product-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.4rem;
+}
+
+.product-desc {
+    color: #666;
+    font-size: 0.92rem;
+    margin-bottom: 1rem;
+}
+
+.product-stock {
+    font-size: 0.85rem;
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+/* ============ FOOTER GLOBAL — Kekeli Ferme ============ */
+.site-footer {
+    background: #1b5e20;
+}
+
+.footer-brand {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.3rem;
+    text-decoration: none;
+}
+
+.footer-brand i {
+    color: #a5d6a7;
+}
+
+.footer-desc {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.95rem;
+    max-width: 300px;
+}
+
+.footer-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    color: #ffe082;
+}
+
+.footer-links li {
+    margin-bottom: 0.6rem;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: #ffe082;
+}
+
+.site-footer .footer-social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-size: 1rem;
+    margin-right: 0.5rem;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.site-footer .footer-social-icon:hover {
+    background: #ffe082;
+    color: #1b5e20;
+    transform: translateY(-2px);
+}
+
+.footer-bottom {
+    background: rgba(0, 0, 0, 0.18);
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.75);
+}
+
