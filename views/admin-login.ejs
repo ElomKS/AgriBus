@@ -25,6 +25,11 @@
                 <h1 class="fw-bold fs-3 mb-1">Espace administrateur</h1>
                 <p class="text-muted mb-4">Kekeli Ferme — accès réservé</p>
 
+                <% if (locals.denied) { %>
+                    <div class="alert alert-warning py-2" role="alert">
+                        <i class="fas fa-ban me-2"></i>Action réservée aux administrateurs.
+                    </div>
+                <% } %>
                 <% if (locals.error) { %>
                     <div class="alert alert-danger py-2" role="alert">
                         <i class="fas fa-triangle-exclamation me-2"></i><%= locals.error %>
@@ -32,10 +37,15 @@
                 <% } %>
 
                 <form action="/admin/login" method="POST" class="text-start">
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-semibold">Identifiant</label>
+                        <input type="text" class="form-control form-control-lg" id="username" name="username"
+                            required autofocus autocomplete="username">
+                    </div>
                     <div class="mb-4">
                         <label for="password" class="form-label fw-semibold">Mot de passe</label>
                         <input type="password" class="form-control form-control-lg" id="password" name="password"
-                            required autofocus>
+                            required autocomplete="current-password">
                     </div>
                     <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill">
                         <i class="fas fa-unlock me-2"></i>Se connecter
