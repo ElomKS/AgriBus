@@ -1,55 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acheter nos Produits - Kekeli Ferme</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/acheter.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <title>achat</title>
 </head>
+
 <body>
     <%- include('../partials/header.ejs') %>
 
     <main class="content-wrapper">
-        <div class="container">
-            <div class="px-4 py-2 my-2 text-center">
-                <% if (locals.items && locals.items.length> 0) { %>
-                    <div class="row row-cols-1 row-cols-md-3 g-4">
-                        <% locals.items.forEach(function(item, index) { %>
-                            <div class="col">
-                                <div class="card">
-                                    <img src="<%= item.image %>" class="card-img-top" alt="<%= item.nom %> "
-                                        width="200" height="250">
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <%= item.nom %>
-                                        </h5>
-                                        <p class="card-text">Prix: <%= item.prix %> CFA</p>
-                                        <form action="/panier/add" method="POST">
-                                            <input type="hidden" name="productId" value="<%= item.id %>">
-                                            <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="btn btn-primary">Ajouter au panier</button>
-                                        </form>
-                                    </div>
+
+        <!-- HERO -->
+        <section class="acheter-hero d-flex align-items-center">
+            <div class="container py-5 text-white text-center">
+                <span class="hero-kicker"><i class="fas fa-cart-shopping me-2"></i>Acheter</span>
+                <h1 class="acheter-title mt-3">Savourez la fraîcheur de notre ferme, chez vous.</h1>
+                <p class="mb-0 opacity-75 mx-auto acheter-intro">Que ce soit en ligne, au marché ou directement à la
+                    ferme, nous vous proposons des produits de qualité, prêts à régaler vos assiettes.</p>
+            </div>
+            <svg class="hero-wave" viewBox="0 0 1440 90" preserveAspectRatio="none">
+                <path fill="#f8faf7" d="M0,60 C360,110 1080,10 1440,60 L1440,90 L0,90 Z"></path>
+            </svg>
+        </section>
+
+        <!-- MODES D'ACHAT -->
+        <section class="container py-5">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="mode-card">
+                        <i class="fas fa-laptop"></i>
+                        <h3>En ligne</h3>
+                        <p>Parcourez nos produits ci-dessous, ajoutez-les à votre panier et finalisez votre commande
+                            en quelques clics.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mode-card">
+                        <i class="fas fa-store"></i>
+                        <h3>Au marché</h3>
+                        <p>Retrouvez-nous sur les étals du marché local avec nos récoltes du matin, encore fraîches.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mode-card">
+                        <i class="fas fa-tractor"></i>
+                        <h3>À la ferme</h3>
+                        <p>Venez cueillir vous-même vos légumes et visiter notre élevage en toute convivialité.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRODUITS A COMMANDER -->
+        <section class="container pb-5">
+            <div class="text-center mb-5">
+                <span class="section-kicker">Commander</span>
+                <h2 class="fw-bold">Composez votre panier</h2>
+                <p class="text-muted mx-auto section-intro">Choisissez vos quantités puis validez votre panier —
+                    livraison rapide et produits toujours frais.</p>
+            </div>
+
+            <% if (locals.items && locals.items.length > 0) { %>
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+                    <% locals.items.forEach(function(item) { %>
+                        <div class="col">
+                            <div class="product-card">
+                                <div class="product-img-wrap">
+                                    <img src="<%= item.image %>" alt="<%= item.nom %>">
+                                    <span class="product-price"><%= item.prix.toFixed(2) %> CFA</span>
+                                </div>
+                                <div class="product-body">
+                                    <h3 class="product-name"><%= item.nom %></h3>
+                                    <p class="product-desc"><%= item.description %></p>
+                                    <form action="/panier/add" method="POST"
+                                        class="d-flex justify-content-between align-items-center mt-auto gap-2">
+                                        <input type="hidden" name="productId" value="<%= item.id %>">
+                                        <div class="qty-group" title="Quantité">
+                                            <button type="button" class="qty-btn" onclick="changeQty(this, -1)">−</button>
+                                            <input type="number" name="quantity" value="1" min="1" max="<%= item.stock %>"
+                                                class="qty-input">
+                                            <button type="button" class="qty-btn" onclick="changeQty(this, 1)">+</button>
+                                        </div>
+                                        <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">
+                                            <i class="fas fa-cart-plus me-1"></i>Ajouter
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
-                            <% }); %>
-                    </div>
-                    <% } else { %>
-                        <p>Aucun produit disponible pour le moment.</p>
-                        <% } %>
-            </div>
-        </div>
+                        </div>
+                    <% }); %>
+                </div>
+
+                <div class="text-center mt-5">
+                    <a href="/panier" class="btn btn-success btn-lg rounded-pill px-5">
+                        <i class="fas fa-basket-shopping me-2"></i>Aller au panier
+                    </a>
+                </div>
+            <% } else { %>
+                <div class="empty-state text-center py-5">
+                    <i class="fas fa-basket-shopping"></i>
+                    <h2 class="mt-4">Aucun produit disponible pour le moment</h2>
+                    <p class="text-muted">Revenez bientôt, la ferme ne manque jamais d'idées.</p>
+                </div>
+            <% } %>
+        </section>
+
     </main>
 
     <%- include('../partials/footer.ejs') %>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-1n4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4"
         crossorigin="anonymous"></script>
+    <script>
+        function changeQty(btn, delta) {
+            const input = btn.parentElement.querySelector('.qty-input');
+            const max = parseInt(input.max) || 99;
+            let value = parseInt(input.value) + delta;
+            input.value = Math.min(Math.max(value, 1), max);
+        }
+    </script>
 </body>
 
 </html>
