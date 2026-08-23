@@ -19,12 +19,22 @@
     <main class="content-wrapper">
       <div class="page-header">
     <h1>Produits disponibles pour achat</h1>
+    <p class="text-muted">Trouvez vos produits favoris parmi les offres de la ferme.</p>
+    <form action="/produits" method="GET" class="row g-2 justify-content-center mt-4">
+        <div class="col-md-6">
+            <input type="text" name="search" class="form-control" placeholder="Rechercher un produit..." value="<%= locals.searchQuery || '' %>">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-success w-100">Chercher</button>
+        </div>
+    </form>
     <hr>
 </div>
 
 <!-- Products List -->
 <div class="container products-container">
     <% if (locals.items && locals.items.length > 0) { %>
+        <p class="text-center text-muted mb-4">Affichage de <%= locals.items.length %> produit(s)</p>
         <div class="row row-cols-1 row-cols-md-3 g-4 product-grid">
             <% locals.items.forEach(function(item) { %>
                 <div class="col">
