@@ -74,4 +74,9 @@ export function getContactMessages() {
   return db.prepare('SELECT * FROM contact_messages ORDER BY id DESC').all();
 }
 
+export function deleteContactMessage(id) {
+  const stmt = db.prepare('DELETE FROM contact_messages WHERE id = ?');
+  return stmt.run(id);
+}
+
 export default db;

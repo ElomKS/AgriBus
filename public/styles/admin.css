@@ -1,0 +1,53 @@
+/* ============ PAGES ADMIN — Kekeli Ferme ============ */
+
+body.admin-body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background-color: #f0f2f5;
+}
+
+/* ---------- LOGIN ---------- */
+.admin-login-card {
+    max-width: 420px;
+    width: 100%;
+    margin: 3rem 1rem;
+}
+
+.admin-lock {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-size: 1.8rem;
+}
+
+/* ---------- MESSAGES ---------- */
+.message-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.message-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1) !important;
+}
+
+.avatar-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #2e7d32;
+    color: #ffffff;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: #a5d6a7;
+}
