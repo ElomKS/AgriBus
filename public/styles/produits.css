@@ -1,0 +1,56 @@
+/* ============ PAGE NOS PRODUITS — Kekeli Ferme ============ */
+/* Les cards produits et éléments communs sont dans main.css */
+
+/* ---------- HERO ---------- */
+.produits-hero {
+    position: relative;
+    background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 55%, #43a047 100%);
+    overflow: hidden;
+}
+
+.produits-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 80% 25%, rgba(255, 255, 255, 0.08) 0, transparent 40%),
+        radial-gradient(circle at 15% 75%, rgba(255, 255, 255, 0.06) 0, transparent 45%);
+    pointer-events: none;
+}
+
+.produits-hero .container {
+    position: relative;
+    z-index: 1;
+}
+
+.produits-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 800;
+}
+
+/* ---------- RECHERCHE ---------- */
+.search-box {
+    position: relative;
+}
+
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.search-box .form-control {
+    border-radius: 999px;
+    padding-left: 2.6rem;
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+    border: none;
+}
+
+/* ---------- ETAT VIDE ---------- */
+.empty-state i {
+    font-size: 4rem;
+    color: #a5d6a7;
+}

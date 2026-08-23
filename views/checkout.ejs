@@ -2,261 +2,291 @@
 <html lang="fr">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Commande</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="/styles/main.css">
-  <link rel="stylesheet" href="/styles/checkout.css">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finaliser la commande - Kekeli Ferme</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/order.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
+
 <body>
-  <%- include('../partials/header.ejs') %>
-  <!-- Header -->
-  <header class="p-3 text-bg-dark">
-    <div class="container">
-      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-          <svg class="bi me-2" width="35" height="32" role="img" aria-label="Bootstrap">
-            <use xlink:href="#bootstrap"></use>
-          </svg>
-        </a>
-        
-      </div>
-    </div>
-  </header>
+    <%- include('../partials/header.ejs') %>
 
-  <main class="content-wrapper container my-5">
-    <!-- Progress Indicator -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="progress-steps d-flex justify-content-center">
-          <div class="step completed">
-            <div class="step-circle">
-              <i class="fas fa-shopping-cart"></i>
+    <main class="content-wrapper">
+
+        <!-- HERO + ETAPES -->
+        <section class="shop-hero d-flex align-items-center">
+            <div class="container py-5 text-center text-white">
+                <span class="hero-kicker"><i class="fas fa-credit-card me-2"></i>Commande</span>
+                <h1 class="shop-hero-title mt-3">Finaliser la commande</h1>
             </div>
-            <div class="step-label">Panier</div>
-          </div>
-          <div class="step-line"></div>
-          <div class="step active">
-            <div class="step-circle">
-              <i class="fas fa-credit-card"></i>
+            <svg class="hero-wave" viewBox="0 0 1440 90" preserveAspectRatio="none">
+                <path fill="#f0f2f5" d="M0,60 C360,110 1080,10 1440,60 L1440,90 L0,90 Z"></path>
+            </svg>
+        </section>
+
+        <div class="container my-5">
+            <div class="progress-steps d-flex justify-content-center mb-5">
+                <div class="step completed">
+                    <div class="step-circle"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="step-label">Panier</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step active">
+                    <div class="step-circle"><i class="fas fa-credit-card"></i></div>
+                    <div class="step-label">Commande</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-circle"><i class="fas fa-check"></i></div>
+                    <div class="step-label">Confirmation</div>
+                </div>
             </div>
-            <div class="step-label">Commande</div>
-          </div>
-          <div class="step-line"></div>
-          <div class="step">
-            <div class="step-circle">
-              <i class="fas fa-check"></i>
-            </div>
-            <div class="step-label">Confirmation</div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="row">
-      <!-- Checkout Form -->
-      <div class="col-lg-7">
-        <div class="card">
-          <div class="card-header bg-success text-white">
-            <h3 class="card-title mb-0">
-              <i class="fas fa-user me-2"></i>Informations de livraison
-            </h3>
-          </div>
-          <div class="card-body">
-            <form id="checkoutForm" action="/checkout" method="POST">
-              <!-- Customer Information -->
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="firstName" class="form-label">Prénom *</label>
-                  <input type="text" class="form-control" id="firstName" name="firstName" required>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label for="lastName" class="form-label">Nom *</label>
-                  <input type="text" class="form-control" id="lastName" name="lastName" required>
-                </div>
-              </div>
+            <div class="row g-4">
+                <!-- FORMULAIRE -->
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <form id="checkoutForm" action="/checkout" method="POST">
+                                <h4 class="text-success mb-3">
+                                    <i class="fas fa-user me-2"></i>Vos informations
+                                </h4>
 
-              <div class="mb-3">
-                <label for="email" class="form-label">Email *</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-              </div>
+                                <div class="mb-3">
+                                    <label for="nom" class="form-label">Nom complet *</label>
+                                    <input type="text" class="form-control" id="nom" name="nom" required>
+                                </div>
 
-              <div class="mb-3">
-                <label for="phone" class="form-label">Téléphone *</label>
-                <input type="tel" class="form-control" id="phone" name="phone" required>
-              </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="email" class="form-label">Email *</label>
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="telephone" class="form-label">Téléphone *</label>
+                                        <input type="tel" class="form-control" id="telephone" name="telephone"
+                                            placeholder="+228 ..." required>
+                                    </div>
+                                </div>
 
-              <!-- Delivery Address -->
-              <h5 class="mt-4 mb-3 text-success">
-                <i class="fas fa-map-marker-alt me-2"></i>Adresse de livraison
-              </h5>
+                                <h4 class="text-success mb-3 mt-4">
+                                    <i class="fas fa-map-marker-alt me-2"></i>Adresse de livraison
+                                </h4>
 
-              <div class="mb-3">
-                <label for="address" class="form-label">Adresse *</label>
-                <input type="text" class="form-control" id="address" name="address" required>
-              </div>
+                                <div class="mb-3">
+                                    <label for="adresse" class="form-label">Adresse *</label>
+                                    <input type="text" class="form-control" id="adresse" name="adresse" required>
+                                </div>
 
-              <div class="row">
-                <div class="col-md-4 mb-3">
-                  <label for="zipCode" class="form-label">Code postal *</label>
-                  <input type="text" class="form-control" id="zipCode" name="zipCode" required>
-                </div>
-                <div class="col-md-8 mb-3">
-                  <label for="city" class="form-label">Ville *</label>
-                  <input type="text" class="form-control" id="city" name="city" required>
-                </div>
-              </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="zipCode" class="form-label">Code postal</label>
+                                        <input type="text" class="form-control" id="zipCode" name="zipCode">
+                                    </div>
+                                    <div class="col-md-8 mb-3">
+                                        <label for="city" class="form-label">Ville</label>
+                                        <input type="text" class="form-control" id="city" name="city">
+                                    </div>
+                                </div>
 
-              <!-- Delivery Options -->
-              <h5 class="mt-4 mb-3 text-success">
-                <i class="fas fa-truck me-2"></i>Mode de livraison
-              </h5>
+                                <h4 class="text-success mb-3 mt-4">
+                                    <i class="fas fa-truck me-2"></i>Mode de livraison
+                                </h4>
 
-              <div class="mb-3">
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="deliveryMethod" id="homeDelivery" value="home" checked>
-                  <label class="form-check-label" for="homeDelivery">
-                    <strong>Livraison à domicile</strong> (Gratuite pour commandes > 30 CFA)
-                    <br>
-                    <small class="text-muted">Délai : 24-48h dans un rayon de 20km</small>
-                  </label>
-                </div>
-                <div class="form-check mt-2">
-                  <input class="form-check-input" type="radio" name="deliveryMethod" id="pickup" value="pickup">
-                  <label class="form-check-label" for="pickup">
-                    <strong>Retrait à la ferme</strong> (Gratuit)
-                    <br>
-                    <small class="text-muted">123 Chemin de la Ferme, 12345 Campagne-sur-Mer</small>
-                  </label>
-                </div>
-              </div>
+                                <div class="delivery-option">
+                                    <input class="form-check-input mt-0" type="radio" name="deliveryMethod"
+                                        id="homeDelivery" value="home" checked>
+                                    <label class="form-check-label" for="homeDelivery">
+                                        <strong>Livraison à domicile</strong><br>
+                                        <small class="text-muted">Gratuite pour commandes &gt; 30 CFA — délai 24-48h
+                                            dans un rayon de 20 km</small>
+                                    </label>
+                                </div>
+                                <div class="delivery-option">
+                                    <input class="form-check-input mt-0" type="radio" name="deliveryMethod"
+                                        id="pickup" value="pickup">
+                                    <label class="form-check-label" for="pickup">
+                                        <strong>Retrait à la ferme</strong> <span
+                                            class="badge bg-success-subtle text-success">Gratuit</span><br>
+                                        <small class="text-muted">Ferme Kekeli, TDB</small>
+                                    </label>
+                                </div>
 
-              <!-- Payment Method -->
-              <h5 class="mt-4 mb-3 text-success">
-                <i class="fas fa-credit-card me-2"></i>Mode de paiement
-              </h5>
+                                <h4 class="text-success mb-3 mt-4">
+                                    <i class="fas fa-wallet me-2"></i>Mode de paiement
+                                </h4>
 
-              <div class="mb-3">
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="paymentMethod" id="cardPayment" value="card" checked>
-                  <label class="form-check-label" for="cardPayment">
-                    <i class="fas fa-credit-card me-2"></i>Carte bancaire
-                  </label>
-                </div>
-                <div class="form-check mt-2">
-                  <input class="form-check-input" type="radio" name="paymentMethod" id="cashPayment" value="cash">
-                  <label class="form-check-label" for="cashPayment">
-                    <i class="fas fa-money-bill-wave me-2"></i>Paiement à la livraison/retrait
-                  </label>
-                </div>
-              </div>
+                                <div class="delivery-option">
+                                    <input class="form-check-input mt-0" type="radio" name="paymentMethod"
+                                        id="cardPayment" value="card" checked>
+                                    <label class="form-check-label" for="cardPayment">
+                                        <i class="fas fa-credit-card me-2"></i>Carte bancaire
+                                    </label>
+                                </div>
+                                <div class="delivery-option">
+                                    <input class="form-check-input mt-0" type="radio" name="paymentMethod"
+                                        id="cashPayment" value="cash">
+                                    <label class="form-check-label" for="cashPayment">
+                                        <i class="fas fa-money-bill-wave me-2"></i>Paiement à la livraison / retrait
+                                    </label>
+                                </div>
 
-              <!-- Special Instructions -->
-              <div class="mb-3">
-                <label for="instructions" class="form-label">Instructions spéciales (optionnel)</label>
-                <textarea class="form-control" id="instructions" name="instructions" rows="3" 
-                  placeholder="Indiquez ici toute instruction particulière pour la livraison..."></textarea>
-              </div>
+                                <div class="mt-4">
+                                    <label for="instructions" class="form-label">Instructions spéciales
+                                        (optionnel)</label>
+                                    <textarea class="form-control" id="instructions" name="instructions" rows="3"
+                                        placeholder="Indiquez ici toute instruction particulière pour la livraison..."></textarea>
+                                </div>
 
-              <!-- Terms and Conditions -->
-              <div class="form-check mb-4">
-                <input class="form-check-input" type="checkbox" id="acceptTerms" name="acceptTerms" required>
-                <label class="form-check-label" for="acceptTerms">
-                  J'accepte les <a href="/terms" target="_blank">conditions générales de vente</a> *
-                </label>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <!-- Order Summary -->
-      <div class="col-lg-5">
-        <div class="card">
-          <div class="card-header bg-success text-white">
-            <h5 class="card-title mb-0">
-              <i class="fas fa-receipt me-2"></i>Récapitulatif de commande
-            </h5>
-          </div>
-          <div class="card-body">
-            <% if (basket && basket.length > 0) { %>
-              <!-- Order Items -->
-              <div class="order-items mb-4">
-                <% basket.forEach(function(item) { %>
-                  <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                    <img src="<%= item.image %>" alt="<%= item.nom %>" class="rounded me-3" width="50" height="50" style="object-fit: cover;">
-                    <div class="flex-grow-1">
-                      <h6 class="mb-1"><%= item.nom %></h6>
-                      <small class="text-muted">Quantité: <%= item.quantity %></small>
+                                <div class="form-check mb-2 mt-4">
+                                    <input class="form-check-input" type="checkbox" id="acceptTerms"
+                                        name="acceptTerms" required>
+                                    <label class="form-check-label" for="acceptTerms">
+                                        J'accepte les
+                                        <button type="button" class="btn btn-link btn-sm p-0 align-baseline text-success"
+                                            data-bs-toggle="modal" data-bs-target="#cgvModal">conditions générales de
+                                            vente</button> *
+                                    </label>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    <div class="text-end">
-                      <span class="fw-bold"><%= (item.prix * item.quantity).toFixed(2) %> CFA</span>
+                </div>
+
+                <!-- RECAPITULATIF -->
+                <div class="col-lg-5">
+                    <div class="card totals-card">
+                        <div class="card-header">
+                            <h5 class="mb-0 fw-bold"><i class="fas fa-receipt me-2"></i>Récapitulatif de commande</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <% if (basket && basket.length > 0) { %>
+                                <% basket.forEach(function(item) { %>
+                                    <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                                        <img src="<%= item.image %>" alt="<%= item.nom %>" width="52" height="52"
+                                            class="rounded-3 me-3" style="object-fit: cover;">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold"><%= item.nom %></div>
+                                            <small class="text-muted">Quantité : <%= item.quantity %></small>
+                                        </div>
+                                        <span class="fw-bold"><%= (item.prix * item.quantity).toFixed(2) %> CFA</span>
+                                    </div>
+                                <% }); %>
+
+                                <div class="totals-line">
+                                    <span>Sous-total</span>
+                                    <span><%= cartTotals.subtotal.toFixed(2) %> CFA</span>
+                                </div>
+                                <div class="totals-line">
+                                    <span>TVA (10%)</span>
+                                    <span><%= cartTotals.tax.toFixed(2) %> CFA</span>
+                                </div>
+                                <div class="totals-line">
+                                    <span>Livraison</span>
+                                    <span class="text-success fw-semibold">Gratuite</span>
+                                </div>
+                                <hr>
+                                <div class="totals-total mb-4">
+                                    <span>Total</span>
+                                    <span><%= cartTotals.total.toFixed(2) %> CFA</span>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" form="checkoutForm" class="btn btn-success btn-lg rounded-pill">
+                                        <i class="fas fa-lock me-2"></i>Confirmer la commande
+                                    </button>
+                                    <a href="/panier" class="btn btn-outline-success rounded-pill">
+                                        <i class="fas fa-arrow-left me-1"></i>Retour au panier
+                                    </a>
+                                </div>
+
+                                <div class="text-center mt-3">
+                                    <small class="text-muted">
+                                        <i class="fas fa-shield-alt me-1"></i>Vos données sont sécurisées et protégées
+                                    </small>
+                                </div>
+                            <% } else { %>
+                                <div class="empty-state text-center py-4">
+                                    <i class="fas fa-basket-shopping"></i>
+                                    <p class="text-muted mt-3">Votre panier est vide.</p>
+                                    <a href="/acheter" class="btn btn-success rounded-pill px-4">
+                                        <i class="fas fa-leaf me-1"></i>Voir nos produits
+                                    </a>
+                                </div>
+                            <% } %>
+                        </div>
                     </div>
-                  </div>
-                <% }); %>
-              </div>
-
-              <!-- Pricing Details -->
-              <div class="pricing-details">
-                <div class="d-flex justify-content-between mb-2">
-                  <span>Sous-total :</span>
-                  <span><%= cartTotals.subtotal.toFixed(2) %> CFA</span>
                 </div>
-                <div class="d-flex justify-content-between mb-2">
-                  <span>TVA (10%) :</span>
-                  <span><%= cartTotals.tax.toFixed(2) %> CFA</span>
-                </div>
-                <div class="d-flex justify-content-between mb-2" id="deliveryFee">
-                  <span>Livraison :</span>
-                  <span class="text-success">Gratuite</span>
-                </div>
-                <hr>
-                <div class="d-flex justify-content-between fw-bold text-success fs-5 mb-4">
-                  <span>Total :</span>
-                  <span><%= cartTotals.total.toFixed(2) %> CFA</span>
-                </div>
-              </div>
-
-              <!-- Action Buttons -->
-              <div class="d-grid gap-2">
-                <button type="submit" form="checkoutForm" class="btn btn-success btn-lg">
-                  <i class="fas fa-lock me-2"></i>Confirmer la commande
-                </button>
-                <a href="/panier" class="btn btn-outline-secondary">
-                  <i class="fas fa-arrow-left me-1"></i>Retour au panier
-                </a>
-              </div>
-
-              <!-- Security Notice -->
-              <div class="text-center mt-3">
-                <small class="text-muted">
-                  <i class="fas fa-shield-alt me-1"></i>
-                  Vos données sont sécurisées et protégées
-                </small>
-              </div>
-            <% } else { %>
-              <div class="text-center py-4">
-                <p class="text-muted">Votre panier est vide</p>
-                <a href="/acheter" class="btn btn-success">
-                  <i class="fas fa-leaf me-1"></i>Voir nos produits
-                </a>
-              </div>
-            <% } %>
-          </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </main>
-  <%- include('../partials/footer.ejs') %>
- 
+    </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"></script>
+    <!-- MODALE CONDITIONS GENERALES DE VENTE -->
+    <div class="modal fade" id="cgvModal" tabindex="-1" aria-labelledby="cgvModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content rounded-4">
+                <div class="modal-header bg-success text-white rounded-top-4">
+                    <h5 class="modal-title fw-bold" id="cgvModalLabel">
+                        <i class="fas fa-file-contract me-2"></i>Conditions générales de vente
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body px-4">
+                    <h6 class="fw-bold mt-2">1. Objet</h6>
+                    <p>Les présentes conditions régissent les ventes de produits agricoles (légumes, poissons,
+                        volailles, œufs) réalisées par Kekeli Ferme via son site internet.</p>
+
+                    <h6 class="fw-bold">2. Produits et prix</h6>
+                    <p>Les produits sont vendus au prix indiqué sur le site, exprimés en francs CFA, TVA (10%)
+                        incluse. Kekeli Ferme se réserve le droit de modifier ses prix à tout moment ; les produits
+                        sont facturés au tarif en vigueur au moment de la commande.</p>
+
+                    <h6 class="fw-bold">3. Commande</h6>
+                    <p>Toute commande implique l'acceptation des présentes conditions. La commande est confirmée par
+                        l'affichage d'un numéro de commande après validation du panier.</p>
+
+                    <h6 class="fw-bold">4. Livraison</h6>
+                    <p>La livraison à domicile est assurée sous 24 à 48 heures dans un rayon de 20 km. Elle est
+                        gratuite pour toute commande supérieure à 30 CFA. Le retrait direct à la ferme est gratuit
+                        sur rendez-vous.</p>
+
+                    <h6 class="fw-bold">5. Paiement</h6>
+                    <p>Le paiement s'effectue par carte bancaire lors de la commande, ou en espèces à la livraison
+                        / au retrait selon l'option choisie.</p>
+
+                    <h6 class="fw-bold">6. Fraîcheur et conformité</h6>
+                        <p>Nos produits étant frais et périssables, nous vous invitons à vérifier votre commande à la
+                        réception. Tout produit non conforme sera remplacé ou remboursé sur simple demande.</p>
+
+                    <h6 class="fw-bold">7. Annulation</h6>
+                    <p>La commande peut être annulée gratuitement jusqu'au début de sa préparation, en nous
+                        contactant par téléphone ou email.</p>
+
+                    <h6 class="fw-bold">8. Contact</h6>
+                    <p class="mb-2">Kekeli Ferme — TDB<br>
+                        Email : agribuscontact@gmail.com<br>
+                        Téléphone : +228 90 50 86 68</p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-success rounded-pill px-4" data-bs-dismiss="modal">
+                        J'ai compris
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
