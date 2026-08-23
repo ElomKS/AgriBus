@@ -6,7 +6,10 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const db = new Database(path.join(__dirname, 'agribus.db'));
+// Sur un hebergeur avec disque persistant (ex: Render), definir DATA_DIR
+// vers le chemin monte (ex: /var/data) pour conserver la base entre les deploiements.
+const dataDir = process.env.DATA_DIR || __dirname;
+const db = new Database(path.join(dataDir, 'agribus.db'));
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS products (
