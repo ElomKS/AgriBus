@@ -354,3 +354,14 @@ body {
     color: rgba(255, 255, 255, 0.75);
 }
 
+.footer-admin-link {
+    color: rgba(255, 255, 255, 0.55);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s ease;
+}
+
+.footer-admin-link:hover {
+    color: #ffffff;
+}
+

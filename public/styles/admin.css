@@ -1,0 +1,109 @@
+/* ============ PAGES ADMIN — Kekeli Ferme ============ */
+
+body.admin-body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background-color: #f0f2f5;
+}
+
+/* ---------- LOGIN ---------- */
+.admin-login-card {
+    max-width: 420px;
+    width: 100%;
+    margin: 3rem 1rem;
+}
+
+.admin-lock {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-size: 1.8rem;
+}
+
+/* ---------- MESSAGES ---------- */
+.messages-list {
+    max-width: 860px;
+}
+
+.message-row {
+    transition: box-shadow 0.2s ease;
+}
+
+.message-row:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+.message-main {
+    min-width: 0;
+}
+
+.message-email {
+    font-size: 0.78rem;
+    color: #2e7d32;
+}
+
+.message-email:hover {
+    color: #1b5e20;
+    text-decoration: underline !important;
+}
+
+.message-text {
+    font-size: 0.82rem;
+    color: #555555;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.delete-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.avatar-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #2e7d32;
+    color: #ffffff;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.avatar-sm {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+}
+
+.role-badge {
+    font-size: 0.75rem;
+    padding: 0.45em 0.9em;
+    border-radius: 50rem;
+}
+
+.role-admin {
+    background: #2e7d32;
+    color: #ffffff;
+}
+
+.role-staff {
+    background: #fff3cd;
+    color: #7a5c00;
+    border: 1px solid #ffe08a;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: #a5d6a7;
+}
