@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import path from 'node:path';
+import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
@@ -9,6 +10,7 @@ const __dirname = path.dirname(__filename);
 // Sur un hebergeur avec disque persistant (ex: Render), definir DATA_DIR
 // vers le chemin monte (ex: /var/data) pour conserver la base entre les deploiements.
 const dataDir = process.env.DATA_DIR || __dirname;
+fs.mkdirSync(dataDir, { recursive: true });
 const db = new Database(path.join(dataDir, 'agribus.db'));
 
 db.exec(`
