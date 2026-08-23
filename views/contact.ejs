@@ -1,36 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Contact Us</title>
-  <link rel="stylesheet" href="/styles/main.css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Maison Agri</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
+
 <body>
-  <%- include('../partials/header.ejs') %>
-  <main class="content-wrapper container mt-5">
-    <h1 class="text-center mb-4">Contactez-nous</h1>
-    <% if (locals.successMessage) { %>
-      <div class="alert alert-success" role="alert"><%= locals.successMessage %></div>
-    <% } %>
-    <form action="/send-message" method="POST" class="mx-auto" style="max-width: 700px;">
-      <div class="mb-3">
-        <label for="name" class="form-label">Name:</label>
-        <input type="text" class="form-control" id="name" name="name" required>
-      </div>
-      <div class="mb-3">
-        <label for="email" class="form-label">Email:</label>
-        <input type="email" class="form-control" id="email" name="email" required>
-      </div>
-      <div class="mb-3">
-        <label for="message" class="form-label">Message:</label>
-        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
-      </div>
-      <button type="submit" class="btn btn-success">Send</button>
-    </form>
-  </div>
-  </main>
-  <%- include('../partials/footer.ejs') %>
+    <%- include('../partials/header.ejs') %>
+    <main class="content-wrapper container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card p-4">
+                    <h1 class="text-center mb-4">Contactez-nous</h1>
+                    <p>Pour toute question ou commande, envoyez-nous un message via le formulaire ci-dessous ou
+                        utilisez nos coordonnées.</p>
+
+                    <% if (locals.successMessage) { %>
+                        <div class="alert alert-success" role="alert">
+                            <i class="fas fa-check-circle me-2"></i><%= locals.successMessage %>
+                        </div>
+                    <% } %>
+
+                    <form action="/send-message" method="POST">
+                        <div class="row justify-content-center">
+                            <div class="col-md-9">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Nom :</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email :</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="message" class="form-label">Message :</label>
+                                    <textarea class="form-control" id="message" name="message" rows="5"
+                                        required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-paper-plane me-2"></i>Envoyer
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3">
+                            <h5><i class="fas fa-envelope me-2"></i>Email</h5>
+                            <p><a href="mailto:agribuscontact@gmail.com">agribuscontact@gmail.com</a></p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <h5><i class="fas fa-phone me-2"></i>Téléphone</h5>
+                            <p><a href="tel:+22890508668">+228 90 50 86 68</a></p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <h5><i class="fas fa-map-marker-alt me-2"></i>Adresse</h5>
+                            <p>TDB</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <%- include('../partials/footer.ejs') %>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
 </body>
+
 </html>
