@@ -104,29 +104,6 @@ export function deleteContactMessage(id) {
   return stmt.run(id);
 }
 
-export function seedUsers() {
-  const count = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
-  if (count > 0) {
-    return [];
-  }
-
-  const adminPassword = process.env.ADMIN_PASSWORD || 'kekeli-admin';
-  const staffPassword = process.env.STAFF_PASSWORD || 'kekeli-staff';
-
-  const insert = db.prepare(`
-    INSERT INTO users (username, password_hash, role)
-    VALUES (?, ?, ?)
-  `);
-
-  insert.run('admin', hashPassword(adminPassword), 'admin');
-  insert.run('staff', hashPassword(staffPassword), 'staff');
-
-  return [
-    { username: 'admin', role: 'admin', password: adminPassword },
-    { username: 'staff', role: 'staff', password: staffPassword },
-  ];
-}
-
 export function getUserByUsername(username) {
   return db.prepare('SELECT * FROM users WHERE username = ?').get(username);
 }
@@ -136,6 +113,17 @@ export function authenticateUser(username, password) {
   if (!user) return null;
   if (!verifyPassword(password, user.password_hash)) return null;
   return { id: user.id, username: user.username, role: user.role };
+}
+
+export function createUser(username, password, role = 'staff') {
+  const stmt = db.prepare(`
+    INSERT INTO users (username, password_hash, role)
+    VALUES (?, ?, ?)
+    ON CONFLICT(username) DO UPDATE SET
+      password_hash = excluded.password_hash,
+      role = excluded.role
+  `);
+  return stmt.run(username, hashPassword(password), role);
 }
 
 export default db;
