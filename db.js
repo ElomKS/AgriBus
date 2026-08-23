@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -24,7 +25,28 @@ db.exec(`
     message TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL CHECK (role IN ('admin', 'staff')),
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
 `);
+
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  return `${salt}:${hash}`;
+}
+
+function verifyPassword(password, stored) {
+  const [salt, hash] = stored.split(':');
+  if (!salt || !hash) return false;
+  const candidate = crypto.scryptSync(password, salt, 64);
+  return crypto.timingSafeEqual(candidate, Buffer.from(hash, 'hex'));
+}
 
 export function getProducts() {
   return db.prepare('SELECT * FROM products ORDER BY id').all();
@@ -72,6 +94,45 @@ export function addContactMessage(name, email, message) {
 
 export function getContactMessages() {
   return db.prepare('SELECT * FROM contact_messages ORDER BY id DESC').all();
+}
+
+export function deleteContactMessage(id) {
+  const stmt = db.prepare('DELETE FROM contact_messages WHERE id = ?');
+  return stmt.run(id);
+}
+
+export function seedUsers() {
+  const count = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
+  if (count > 0) {
+    return [];
+  }
+
+  const adminPassword = process.env.ADMIN_PASSWORD || 'kekeli-admin';
+  const staffPassword = process.env.STAFF_PASSWORD || 'kekeli-staff';
+
+  const insert = db.prepare(`
+    INSERT INTO users (username, password_hash, role)
+    VALUES (?, ?, ?)
+  `);
+
+  insert.run('admin', hashPassword(adminPassword), 'admin');
+  insert.run('staff', hashPassword(staffPassword), 'staff');
+
+  return [
+    { username: 'admin', role: 'admin', password: adminPassword },
+    { username: 'staff', role: 'staff', password: staffPassword },
+  ];
+}
+
+export function getUserByUsername(username) {
+  return db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+}
+
+export function authenticateUser(username, password) {
+  const user = getUserByUsername(username);
+  if (!user) return null;
+  if (!verifyPassword(password, user.password_hash)) return null;
+  return { id: user.id, username: user.username, role: user.role };
 }
 
 export default db;

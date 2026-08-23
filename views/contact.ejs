@@ -7,70 +7,103 @@
     <title>Contact - Kekeli Ferme</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-    <link rel="stylesheet" href="/styles/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/contact.css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 </head>
 
 <body>
     <%- include('../partials/header.ejs') %>
-    <main class="content-wrapper container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card p-4">
-                    <h1 class="text-center mb-4">Contactez-nous</h1>
-                    <p>Pour toute question ou commande, envoyez-nous un message via le formulaire ci-dessous ou
-                        utilisez nos coordonnées.</p>
 
-                    <% if (locals.successMessage) { %>
-                        <div class="alert alert-success" role="alert">
-                            <i class="fas fa-check-circle me-2"></i><%= locals.successMessage %>
-                        </div>
-                    <% } %>
+    <main class="content-wrapper">
 
-                    <form action="/send-message" method="POST">
-                        <div class="row justify-content-center">
-                            <div class="col-md-9">
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Nom :</label>
-                                    <input type="text" class="form-control" id="name" name="name" required>
+        <!-- HERO -->
+        <section class="contact-hero d-flex align-items-center">
+            <div class="container py-5 text-center text-white">
+                <span class="hero-kicker"><i class="fas fa-paper-plane me-2"></i>Contact</span>
+                <h1 class="contact-title mt-3">Contactez-nous</h1>
+                <p class="mb-0 opacity-75 mx-auto contact-intro">Pour toute question ou commande, envoyez-nous un
+                    message via le formulaire ci-dessous ou utilisez nos coordonnées.</p>
+            </div>
+            <svg class="hero-wave" viewBox="0 0 1440 90" preserveAspectRatio="none">
+                <path fill="#f0f2f5" d="M0,60 C360,110 1080,10 1440,60 L1440,90 L0,90 Z"></path>
+            </svg>
+        </section>
+
+        <!-- COORDONNEES -->
+        <section class="container py-5">
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <a href="mailto:kekeliferme@outlook.com" class="info-card text-decoration-none">
+                        <i class="fas fa-envelope"></i>
+                        <h3>Email</h3>
+                        <p>kekeliferme@outlook.com</p>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="tel:+22890508668" class="info-card text-decoration-none">
+                        <i class="fas fa-phone"></i>
+                        <h3>Téléphone</h3>
+                        <p>+228 90 50 86 68</p>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card">
+                        <i class="fas fa-location-dot"></i>
+                        <h3>Adresse</h3>
+                        <p>Ferme Kekeli, TDB</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORMULAIRE -->
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-4 p-md-5">
+                            <h2 class="fw-bold mb-2">Écrivez-nous</h2>
+                            <p class="text-muted mb-4">Nous répondons généralement sous 24h.</p>
+
+                            <% if (locals.successMessage) { %>
+                                <div class="alert alert-success d-flex align-items-center gap-2" role="alert">
+                                    <i class="fas fa-check-circle fs-4"></i>
+                                    <span><%= locals.successMessage %></span>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email :</label>
-                                    <input type="email" class="form-control" id="email" name="email" required>
+                            <% } %>
+
+                            <form action="/send-message" method="POST">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="name" class="form-label fw-semibold">Nom *</label>
+                                        <input type="text" class="form-control form-control-lg" id="name"
+                                            name="name" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="email" class="form-label fw-semibold">Email *</label>
+                                        <input type="email" class="form-control form-control-lg" id="email"
+                                            name="email" required>
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="message" class="form-label">Message :</label>
-                                    <textarea class="form-control" id="message" name="message" rows="5"
-                                        required></textarea>
+                                <div class="mb-4">
+                                    <label for="message" class="form-label fw-semibold">Message *</label>
+                                    <textarea class="form-control form-control-lg" id="message" name="message"
+                                        rows="5" required></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-success">
+                                <button type="submit" class="btn btn-success btn-lg rounded-pill px-5">
                                     <i class="fas fa-paper-plane me-2"></i>Envoyer
                                 </button>
-                            </div>
-                        </div>
-                    </form>
-
-                    <hr>
-
-                    <div class="row text-center">
-                        <div class="col-md-4 mb-3">
-                            <h5><i class="fas fa-envelope me-2"></i>Email</h5>
-                            <p><a href="mailto:agribuscontact@gmail.com">agribuscontact@gmail.com</a></p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <h5><i class="fas fa-phone me-2"></i>Téléphone</h5>
-                            <p><a href="tel:+22890508668">+228 90 50 86 68</a></p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <h5><i class="fas fa-map-marker-alt me-2"></i>Adresse</h5>
-                            <p>TDB</p>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
     </main>
+
     <%- include('../partials/footer.ejs') %>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
         crossorigin="anonymous"></script>
