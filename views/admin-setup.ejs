@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Première configuration - Kekeli Ferme</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/admin.css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+
+<body class="admin-body">
+    <main class="content-wrapper d-flex align-items-center justify-content-center">
+        <div class="card admin-login-card border-0 shadow-sm rounded-4">
+            <div class="card-body p-5 text-center">
+                <div class="admin-lock mx-auto mb-4">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h1 class="fw-bold fs-3 mb-1">Première configuration</h1>
+                <p class="text-muted mb-4">Créez votre compte administrateur Kekeli Ferme</p>
+
+                <% if (locals.error) { %>
+                    <div class="alert alert-danger py-2" role="alert">
+                        <i class="fas fa-triangle-exclamation me-2"></i><%= locals.error %>
+                    </div>
+                <% } %>
+
+                <div class="alert alert-info text-start py-2 px-3 small">
+                    <i class="fas fa-circle-info me-2"></i>
+                    Cette page n'apparaît qu'une seule fois, tant qu'aucun compte n'existe.
+                </div>
+
+                <form action="/admin/setup" method="POST" class="text-start">
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-semibold">Identifiant admin</label>
+                        <input type="text" class="form-control form-control-lg" id="username" name="username"
+                            value="<%= locals.username || 'admin' %>" required autocomplete="username">
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label fw-semibold">Mot de passe</label>
+                        <input type="password" class="form-control form-control-lg" id="password" name="password"
+                            required minlength="8" autocomplete="new-password">
+                        <div class="form-text">8 caractères minimum</div>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill">
+                        <i class="fas fa-check me-2"></i>Créer mon compte admin
+                    </button>
+                </form>
+
+                <a href="/" class="d-inline-block mt-4 text-decoration-none text-muted small">
+                    <i class="fas fa-arrow-left me-1"></i>Retour au site
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
