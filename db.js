@@ -9,8 +9,15 @@ const __dirname = path.dirname(__filename);
 
 // Sur un hebergeur avec disque persistant (ex: Render), definir DATA_DIR
 // vers le chemin monte (ex: /var/data) pour conserver la base entre les deploiements.
-const dataDir = process.env.DATA_DIR || __dirname;
-fs.mkdirSync(dataDir, { recursive: true });
+// Si le chemin est inaccessible, on replie sur le dossier du projet plutot que de crasher.
+let dataDir = process.env.DATA_DIR || __dirname;
+try {
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.accessSync(dataDir, fs.constants.W_OK);
+} catch (err) {
+    console.warn(`[KEKELI] DATA_DIR "${dataDir}" inaccessible (${err.code}) — repli sur ${__dirname}. Les donnees ne seront pas conservees au redemarrage.`);
+    dataDir = __dirname;
+}
 const db = new Database(path.join(dataDir, 'agribus.db'));
 
 db.exec(`
