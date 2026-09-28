@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utilisateurs - Administration - Kekeli Ferme</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/admin.css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+
+<body class="admin-body">
+    <main class="content-wrapper container py-4 users-container">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <div>
+                <span class="section-kicker">Administration</span>
+                <h1 class="fw-bold mb-0 fs-3">Comptes utilisateurs</h1>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge role-badge <%= user.role === 'admin' ? 'role-admin' : 'role-staff' %>">
+                    <i class="fas <%= user.role === 'admin' ? 'fa-user-shield' : 'fa-user' %> me-1"></i><%= user.username %>
+                </span>
+                <a href="/admin" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <i class="fas fa-envelope me-1"></i>Messages
+                </a>
+                <a href="/" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <i class="fas fa-house me-1"></i>Site
+                </a>
+                <form action="/admin/logout" method="POST">
+                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                        <i class="fas fa-right-from-bracket me-1"></i>Quitter
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <% if (locals.error) { %>
+            <div class="alert alert-danger py-2"><i class="fas fa-triangle-exclamation me-2"></i><%= error %></div>
+        <% } %>
+        <% if (locals.success) { %>
+            <div class="alert alert-success py-2"><i class="fas fa-circle-check me-2"></i><%= success %></div>
+        <% } %>
+
+        <div class="row g-3">
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <h2 class="fs-5 fw-bold mb-3">
+                            <i class="fas fa-user-plus text-success me-2"></i>Nouveau compte
+                        </h2>
+                        <form action="/admin/users/create" method="POST">
+                            <div class="mb-3">
+                                <label for="username" class="form-label fw-semibold small">Identifiant</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label fw-semibold small">Mot de passe</label>
+                                <input type="password" class="form-control" id="password" name="password" required
+                                    minlength="8" autocomplete="new-password">
+                                <div class="form-text">8 caractères minimum</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="role" class="form-label fw-semibold small">Rôle</label>
+                                <select class="form-select" id="role" name="role">
+                                    <option value="staff" selected>Staff — voir les messages seulement</option>
+                                    <option value="admin">Admin — accès complet</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success rounded-pill px-4 w-100">
+                                <i class="fas fa-plus me-1"></i>Créer le compte
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-4 mb-3">
+                    <div class="card-body p-4">
+                        <h2 class="fs-5 fw-bold mb-3">
+                            <i class="fas fa-users text-success me-2"></i>Comptes existants
+                        </h2>
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0 users-table">
+                                <thead>
+                                    <tr>
+                                        <th>Identifiant</th>
+                                        <th>Rôle</th>
+                                        <th>Créé le</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% users.forEach(function(u) { %>
+                                        <tr>
+                                            <td class="fw-semibold">
+                                                <% if (u.id === user.id) { %>
+                                                    <i class="fas fa-circle text-success me-1" title="Vous"></i>
+                                                <% } %>
+                                                <%= u.username %>
+                                            </td>
+                                            <td>
+                                                <span class="badge role-badge <%= u.role === 'admin' ? 'role-admin' : 'role-staff' %>">
+                                                    <%= u.role === 'admin' ? 'Admin' : 'Staff' %>
+                                                </span>
+                                            </td>
+                                            <td class="small text-muted">
+                                                <%= new Date(String(u.created_at).replace(' ', 'T')).toLocaleDateString('fr-FR') %>
+                                            </td>
+                                            <td class="text-end">
+                                                <% if (u.id !== user.id) { %>
+                                                    <form action="/admin/users/delete" method="POST" class="d-inline"
+                                                        onsubmit="return confirm('Supprimer le compte <%= u.username %> ?')">
+                                                        <input type="hidden" name="id" value="<%= u.id %>">
+                                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle delete-btn"
+                                                            title="Supprimer">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                <% } else { %>
+                                                    <span class="text-muted small">—</span>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <h2 class="fs-5 fw-bold mb-3">
+                            <i class="fas fa-key text-success me-2"></i>Changer un mot de passe
+                        </h2>
+                        <form action="/admin/users/password" method="POST" class="row g-2 align-items-end">
+                            <div class="col-sm-6">
+                                <label for="user-id" class="form-label fw-semibold small">Compte</label>
+                                <select class="form-select" id="user-id" name="id" required>
+                                    <% users.forEach(function(u) { %>
+                                        <option value="<%= u.id %>"><%= u.username %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="new-password" class="form-label fw-semibold small">Nouveau mot de passe</label>
+                                <input type="password" class="form-control" id="new-password" name="password" required
+                                    minlength="8" autocomplete="new-password">
+                            </div>
+                            <div class="col-sm-2 d-grid">
+                                <button type="submit" class="btn btn-success rounded-pill">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
