@@ -1,0 +1,98 @@
+/* ========================================
+   AVIS CLIENTS - page publique /avis
+   ======================================== */
+
+.avis-hero {
+    position: relative;
+    background: linear-gradient(135deg, #1b7a3d 0%, #2f9e57 55%, #48b76a 100%);
+    min-height: 320px;
+}
+
+.avis-title {
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    font-weight: 800;
+}
+
+.avis-intro {
+    max-width: 620px;
+    font-size: 1.05rem;
+}
+
+.avis-score {
+    font-size: 3.4rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #1b7a3d;
+}
+
+.avis-score-max {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: #8a8f98;
+}
+
+.avis-stars {
+    display: flex;
+    gap: .2rem;
+    color: #f0ad4e;
+    font-size: 1.05rem;
+}
+
+.avis-stars .fa-star {
+    color: #f0ad4e;
+}
+
+.avis-stars .far.fa-star {
+    color: #dcdfe3;
+}
+
+.avis-text {
+    color: #4a4f57;
+    font-size: .95rem;
+    line-height: 1.6;
+    margin-bottom: 0;
+    overflow-wrap: anywhere;
+}
+
+.avis-card {
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.avis-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 .75rem 1.5rem rgba(27, 122, 61, .12) !important;
+}
+
+.star-input {
+    display: flex;
+    gap: .35rem;
+    align-items: center;
+}
+
+.star-input i {
+    color: #dcdfe3;
+    font-size: 1.9rem;
+    cursor: pointer;
+    transition: color .15s ease, transform .15s ease;
+}
+
+.star-input i:hover,
+.star-input i.on {
+    color: #f0ad4e;
+    transform: scale(1.05);
+}
+
+.star-input i:focus-visible {
+    outline: 2px solid #1b7a3d;
+    outline-offset: 3px;
+}
+
+.avis-hint {
+    font-size: .85rem;
+    color: #6c727a;
+}
+
+.empty-icon {
+    font-size: 2.6rem;
+    color: #c9ced4;
+}

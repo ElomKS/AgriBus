@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avis clients - Kekeli Ferme</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/avis.css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <%- include('../partials/og') %>
+</head>
+
+<body>
+    <%- include('../partials/header.ejs') %>
+
+    <main class="content-wrapper">
+
+        <!-- HERO -->
+        <section class="avis-hero d-flex align-items-center">
+            <div class="container py-5 text-center text-white">
+                <span class="hero-kicker"><i class="fas fa-star me-2"></i>Avis clients</span>
+                <h1 class="avis-title mt-3">Ce que disent nos clients</h1>
+                <p class="mb-0 opacity-75 mx-auto avis-intro">Vos retours nous aident a ameliorer nos produits et notre
+                    service. Partagez votre experience a la ferme.</p>
+            </div>
+            <svg class="hero-wave" viewBox="0 0 1440 90" preserveAspectRatio="none">
+                <path fill="#f0f2f5" d="M0,60 C360,110 1080,10 1440,60 L1440,90 L0,90 Z"></path>
+            </svg>
+        </section>
+
+        <!-- NOTE MOYENNE -->
+        <section class="container py-5">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body text-center p-4">
+                            <span class="section-kicker">Note moyenne</span>
+                            <div class="avis-score mt-2"><%= stats.average ? stats.average.toFixed(1) : '-' %><span
+                                    class="avis-score-max">/5</span></div>
+                            <div class="avis-stars justify-content-center mt-2">
+                                <%- include('../partials/stars', { rating: Math.round(stats.average) }) %>
+                            </div>
+                            <p class="text-muted small mb-0 mt-2">
+                                <i class="far fa-comments me-1"></i><strong><%= stats.count %></strong> avis publie(s)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FORMULAIRE -->
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <h2 class="fw-bold mb-1"><i class="fas fa-pen-to-square me-2 text-success"></i>Laisser un avis</h2>
+                            <p class="text-muted small mb-4">Votre avis est verifie par notre equipe avant publication.</p>
+
+                            <% if (locals.successMessage) { %>
+                                <div class="alert alert-success d-flex align-items-center gap-2" role="alert">
+                                    <i class="fas fa-check-circle fs-4"></i>
+                                    <span><%= locals.successMessage %></span>
+                                </div>
+                            <% } %>
+                            <% if (locals.errorMessage) { %>
+                                <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+                                    <i class="fas fa-circle-exclamation fs-4"></i>
+                                    <span><%= locals.errorMessage %></span>
+                                </div>
+                            <% } %>
+
+                            <form action="/avis/add" method="POST" class="avis-form">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="author" class="form-label fw-semibold">Votre nom *</label>
+                                        <input type="text" class="form-control form-control-lg" id="author" name="author"
+                                            maxlength="60" required placeholder="Ex: Awa Koffi">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold d-block">Votre note *</label>
+                                        <div class="star-input" id="starInput" role="radiogroup" aria-label="Note sur 5">
+                                            <i class="fas fa-star" data-v="1" role="button" tabindex="0"
+                                                aria-label="1 etoile"></i>
+                                            <i class="fas fa-star" data-v="2" role="button" tabindex="0"
+                                                aria-label="2 etoiles"></i>
+                                            <i class="fas fa-star" data-v="3" role="button" tabindex="0"
+                                                aria-label="3 etoiles"></i>
+                                            <i class="fas fa-star" data-v="4" role="button" tabindex="0"
+                                                aria-label="4 etoiles"></i>
+                                            <i class="fas fa-star" data-v="5" role="button" tabindex="0"
+                                                aria-label="5 etoiles"></i>
+                                        </div>
+                                        <input type="hidden" name="rating" id="ratingValue" value="5">
+                                        <div class="form-text avis-hint" id="starHint">5 etoiles - Excellent</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="comment" class="form-label fw-semibold">Votre avis *</label>
+                                        <textarea class="form-control form-control-lg" id="comment" name="comment"
+                                            rows="4" maxlength="600" required
+                                            placeholder="Qualite des produits, livraison, accueil..."></textarea>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-success btn-lg rounded-pill px-5 mt-4">
+                                    <i class="fas fa-star me-2"></i>Publier mon avis
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LISTE DES AVIS -->
+        <section class="container pb-5">
+            <h2 class="fw-bold text-center mb-4"><i class="fas fa-quote-left me-2 text-success"></i>Avis publies</h2>
+
+            <% if (locals.reviews && reviews.length > 0) { %>
+                <div class="row g-4">
+                    <% reviews.forEach(function(review) { %>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card border-0 shadow-sm rounded-4 h-100 avis-card">
+                                <div class="card-body p-4">
+                                    <div class="avis-stars mb-2">
+                                        <%- include('../partials/stars', { rating: review.rating }) %>
+                                    </div>
+                                    <p class="avis-text"><%= review.comment %></p>
+                                    <div class="d-flex align-items-center gap-2 mt-3">
+                                        <span class="avatar-circle avatar-sm"><%= review.author.charAt(0).toUpperCase() %></span>
+                                        <div class="min-w-0">
+                                            <div class="fw-semibold small text-truncate"><%= review.author %></div>
+                                            <small class="text-muted">
+                                                <i class="far fa-clock me-1"></i><%= new Date(review.created_at.replace(' ', 'T')).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) %>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body text-center py-5">
+                        <i class="far fa-star empty-icon"></i>
+                        <h2 class="fs-4 mt-3">Aucun avis publie pour le moment</h2>
+                        <p class="text-muted mb-0">Soyez le premier a partager votre experience avec la ferme.</p>
+                    </div>
+                </div>
+            <% } %>
+        </section>
+
+    </main>
+
+    <%- include('../partials/footer.ejs') %>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script>
+        (function () {
+            var wrap = document.getElementById('starInput');
+            var hidden = document.getElementById('ratingValue');
+            var hint = document.getElementById('starHint');
+            if (!wrap || !hidden) return;
+
+            var labels = { 1: '1 etoile - A ameliorer', 2: '2 etoiles - Passable', 3: '3 etoiles - Correct', 4: '4 etoiles - Tres bien', 5: '5 etoiles - Excellent' };
+            var stars = wrap.querySelectorAll('[data-v]');
+
+            function paint(value) {
+                stars.forEach(function (star) {
+                    star.classList.toggle('on', Number(star.getAttribute('data-v')) <= Number(value));
+                });
+                if (hint) hint.textContent = labels[value] || '';
+            }
+
+            function select(value) {
+                hidden.value = value;
+                paint(value);
+            }
+
+            wrap.addEventListener('click', function (e) {
+                var star = e.target.closest('[data-v]');
+                if (star) select(star.getAttribute('data-v'));
+            });
+
+            wrap.addEventListener('keydown', function (e) {
+                var star = e.target.closest('[data-v]');
+                if (star && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    select(star.getAttribute('data-v'));
+                }
+            });
+
+            wrap.addEventListener('mouseover', function (e) {
+                var star = e.target.closest('[data-v]');
+                if (star) paint(star.getAttribute('data-v'));
+            });
+
+            wrap.addEventListener('mouseleave', function () {
+                paint(hidden.value);
+            });
+
+            select(hidden.value);
+        })();
+    </script>
+</body>
+
+</html>

@@ -45,6 +45,15 @@ db.exec(`
     role TEXT NOT NULL CHECK (role IN ('admin', 'staff')),
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    author TEXT NOT NULL,
+    rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved')),
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 function hashPassword(password) {
@@ -159,6 +168,51 @@ export function createUser(username, password, role = 'staff') {
       role = excluded.role
   `);
   return stmt.run(username, hashPassword(password), role);
+}
+
+// ============ AVIS CLIENTS ============
+export function addReview(author, rating, comment) {
+  const stmt = db.prepare(`
+    INSERT INTO reviews (author, rating, comment, status)
+    VALUES (?, ?, ?, 'pending')
+  `);
+  return stmt.run(author, rating, comment);
+}
+
+export function getApprovedReviews() {
+  return db.prepare("SELECT * FROM reviews WHERE status = 'approved' ORDER BY created_at DESC, id DESC").all();
+}
+
+export function getAllReviews() {
+  return db.prepare(`
+    SELECT * FROM reviews
+    ORDER BY CASE status WHEN 'pending' THEN 0 ELSE 1 END, created_at DESC, id DESC
+  `).all();
+}
+
+export function getReviewStats() {
+  const row = db.prepare(`
+    SELECT COUNT(*) AS count, COALESCE(AVG(rating), 0) AS average
+    FROM reviews WHERE status = 'approved'
+  `).get();
+  return {
+    count: row.count,
+    average: row.average ? Math.round(row.average * 10) / 10 : 0
+  };
+}
+
+export function countPendingReviews() {
+  return db.prepare("SELECT COUNT(*) AS count FROM reviews WHERE status = 'pending'").get().count;
+}
+
+export function setReviewStatus(id, status) {
+  const stmt = db.prepare('UPDATE reviews SET status = ? WHERE id = ?');
+  return stmt.run(status, id);
+}
+
+export function deleteReview(id) {
+  const stmt = db.prepare('DELETE FROM reviews WHERE id = ?');
+  return stmt.run(id);
 }
 
 export default db;
