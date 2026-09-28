@@ -121,6 +121,28 @@ export function countUsers() {
   return db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
 }
 
+export function listUsers() {
+  return db.prepare('SELECT id, username, role, created_at FROM users ORDER BY role, username').all();
+}
+
+export function getUserById(id) {
+  return db.prepare('SELECT id, username, role FROM users WHERE id = ?').get(id);
+}
+
+export function countAdmins() {
+  return db.prepare("SELECT COUNT(*) AS count FROM users WHERE role = 'admin'").get().count;
+}
+
+export function changeUserPassword(id, password) {
+  const stmt = db.prepare('UPDATE users SET password_hash = ? WHERE id = ?');
+  return stmt.run(hashPassword(password), id);
+}
+
+export function deleteUser(id) {
+  const stmt = db.prepare('DELETE FROM users WHERE id = ?');
+  return stmt.run(id);
+}
+
 export function authenticateUser(username, password) {
   const user = getUserByUsername(username);
   if (!user) return null;
