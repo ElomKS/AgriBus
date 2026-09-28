@@ -1,7 +1,7 @@
-﻿{
-  "name": "agribus",
+{
+  "name": "kekeli-ferme",
   "version": "1.0.0",
-  "description": "Application de boutique en ligne pour produits fermiers avec panier et commande en CFA",
+  "description": "Kekeli Ferme - boutique en ligne de produits fermiers (panier, commande en CFA, contact)",
   "main": "index.js",
   "type": "module",
   "scripts": {
