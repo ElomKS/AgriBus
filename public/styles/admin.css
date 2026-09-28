@@ -129,3 +129,14 @@ body.admin-body {
 .users-table tbody tr:hover {
     background-color: #f7fbf7;
 }
+
+/* ---------- AVIS CLIENTS ---------- */
+.avis-stars {
+    display: inline-flex;
+    gap: .15rem;
+    color: #f0ad4e;
+}
+
+.avis-stars .far.fa-star {
+    color: #dcdfe3;
+}
