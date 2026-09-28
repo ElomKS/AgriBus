@@ -117,6 +117,10 @@ export function getUserByUsername(username) {
   return db.prepare('SELECT * FROM users WHERE username = ?').get(username);
 }
 
+export function countUsers() {
+  return db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
+}
+
 export function authenticateUser(username, password) {
   const user = getUserByUsername(username);
   if (!user) return null;
