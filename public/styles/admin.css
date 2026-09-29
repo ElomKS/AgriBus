@@ -46,16 +46,24 @@ body.admin-body {
 }
 
 .admin-empty {
-    padding: 1.5rem 1rem !important;
+    padding: 0.85rem 0.75rem !important;
 }
 
 .admin-empty .empty-icon {
-    font-size: 2rem;
+    font-size: 1.5rem;
+    margin-bottom: 0;
 }
 
 .admin-empty h2 {
-    font-size: 1.05rem;
-    margin-top: 0.5rem;
+    font-size: 0.92rem;
+    font-weight: 700;
+    margin-top: 0.3rem;
+    margin-bottom: 0.1rem;
+}
+
+.admin-empty p {
+    font-size: 0.76rem;
+    margin-bottom: 0;
 }
 
 .message-row:hover {
