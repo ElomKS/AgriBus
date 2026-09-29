@@ -98,3 +98,19 @@ body {
     font-size: 0.92rem;
     margin-bottom: 0;
 }
+
+/* ---------- CADRE DU FORMULAIRE DE CONTACT (compact) ---------- */
+.contact-tight .info-card {
+    padding: 0.9rem 0.85rem;
+}
+
+.contact-tight .info-card i {
+    width: 36px;
+    height: 36px;
+    font-size: 0.95rem;
+    margin-bottom: 0.35rem;
+}
+
+.contact-tight .info-card p {
+    font-size: 0.85rem;
+}

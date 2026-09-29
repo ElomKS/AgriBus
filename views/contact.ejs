@@ -35,8 +35,8 @@
         </section>
 
         <!-- COORDONNEES -->
-        <section class="container py-4">
-            <div class="row g-3 mb-4">
+        <section class="container py-4 contact-tight">
+            <div class="row g-3 mb-3">
                 <div class="col-md-4">
                     <a href="mailto:kekeliferme@outlook.com" class="info-card text-decoration-none">
                         <i class="fas fa-envelope"></i>
@@ -62,11 +62,11 @@
 
             <!-- FORMULAIRE -->
             <div class="row justify-content-center">
-                <div class="col-lg-8">
+                <div class="col-md-9 col-lg-6">
                     <div class="card border-0 shadow-sm rounded-4">
-                        <div class="card-body p-4">
-                            <h2 class="fw-bold mb-2">Écrivez-nous</h2>
-                            <p class="text-muted mb-3">Nous répondons généralement sous 24h.</p>
+                        <div class="card-body p-3">
+                            <h2 class="fw-bold mb-1">Écrivez-nous</h2>
+                            <p class="text-muted small mb-2">Nous répondons généralement sous 24h.</p>
 
                             <% if (locals.successMessage) { %>
                                 <div class="alert alert-success d-flex align-items-center gap-2" role="alert">
@@ -76,24 +76,24 @@
                             <% } %>
 
                             <form action="/send-message" method="POST">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="name" class="form-label fw-semibold">Nom *</label>
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label for="name" class="form-label fw-semibold small mb-1">Nom *</label>
                                         <input type="text" class="form-control" id="name"
                                             name="name" required>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="email" class="form-label fw-semibold">Email *</label>
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label fw-semibold small mb-1">Email *</label>
                                         <input type="email" class="form-control" id="email"
                                             name="email" required>
                                     </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="message" class="form-label fw-semibold">Message *</label>
+                                <div class="mt-2">
+                                    <label for="message" class="form-label fw-semibold small mb-1">Message *</label>
                                     <textarea class="form-control" id="message" name="message"
-                                        rows="4" required></textarea>
+                                        rows="3" required></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-success rounded-pill px-4">
+                                <button type="submit" class="btn btn-success btn-sm rounded-pill px-4 mt-1">
                                     <i class="fas fa-paper-plane me-2"></i>Envoyer
                                 </button>
                             </form>
