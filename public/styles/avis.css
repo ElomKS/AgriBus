@@ -5,21 +5,21 @@
 .avis-hero {
     position: relative;
     background: linear-gradient(135deg, #1b7a3d 0%, #2f9e57 55%, #48b76a 100%);
-    min-height: 320px;
+    min-height: 230px;
 }
 
 .avis-title {
-    font-size: clamp(1.9rem, 4vw, 3rem);
+    font-size: clamp(1.6rem, 3.2vw, 2.3rem);
     font-weight: 800;
 }
 
 .avis-intro {
-    max-width: 620px;
-    font-size: 1.05rem;
+    max-width: 560px;
+    font-size: 0.95rem;
 }
 
 .avis-score {
-    font-size: 3.4rem;
+    font-size: 2.4rem;
     font-weight: 800;
     line-height: 1;
     color: #1b7a3d;
@@ -48,8 +48,8 @@
 
 .avis-text {
     color: #4a4f57;
-    font-size: .95rem;
-    line-height: 1.6;
+    font-size: .88rem;
+    line-height: 1.5;
     margin-bottom: 0;
     overflow-wrap: anywhere;
 }
@@ -71,7 +71,7 @@
 
 .star-input i {
     color: #dcdfe3;
-    font-size: 1.9rem;
+    font-size: 1.5rem;
     cursor: pointer;
     transition: color .15s ease, transform .15s ease;
 }

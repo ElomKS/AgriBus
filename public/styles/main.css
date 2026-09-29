@@ -300,21 +300,22 @@ body {
 
 .footer-desc {
     color: rgba(255, 255, 255, 0.75);
-    font-size: 0.95rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
     max-width: 300px;
 }
 
 .footer-heading {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     color: #ffe082;
 }
 
 .footer-links li {
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.3rem;
     color: rgba(255, 255, 255, 0.75);
 }
 
@@ -332,13 +333,13 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.12);
     color: #ffffff;
-    font-size: 1rem;
-    margin-right: 0.5rem;
+    font-size: 0.85rem;
+    margin-right: 0.4rem;
     transition: background 0.2s ease, transform 0.2s ease;
 }
 
@@ -350,7 +351,7 @@ body {
 
 .footer-bottom {
     background: rgba(0, 0, 0, 0.18);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.75);
 }
 
@@ -369,6 +370,8 @@ body {
 /* ---------- AVIS CLIENTS (accueil) ---------- */
 .home-reviews {
     background-color: #f7fbf7;
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
 }
 
 .home-reviews-score {
