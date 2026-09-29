@@ -81,8 +81,8 @@
             </p>
             <div class="messages-list">
                 <% reviews.forEach(function(review) { %>
-                    <div class="card message-row border-0 shadow-sm rounded-3 mb-2">
-                        <div class="card-body py-3 px-3">
+                    <div class="card message-row border-0 shadow-sm rounded-3 mb-1">
+                        <div class="card-body py-2 px-2">
                             <div class="d-flex flex-wrap align-items-center gap-2">
                                 <span class="avatar-circle avatar-sm"><%= review.author.charAt(0).toUpperCase() %></span>
                                 <div class="message-main flex-grow-1 min-w-0">
@@ -141,9 +141,9 @@
             </div>
         <% } else { %>
             <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body text-center py-5">
+                <div class="card-body admin-empty text-center">
                     <i class="far fa-star empty-icon"></i>
-                    <h2 class="fs-4 mt-3">Aucun avis pour le moment</h2>
+                    <h2 class="fs-5">Aucun avis pour le moment</h2>
                     <p class="text-muted mb-0">Les avis envoyes depuis la page /avis apparaitront ici.</p>
                 </div>
             </div>

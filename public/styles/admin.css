@@ -26,11 +26,36 @@ body.admin-body {
 
 /* ---------- MESSAGES ---------- */
 .messages-list {
-    max-width: 860px;
+    max-width: 760px;
 }
 
 .message-row {
     transition: box-shadow 0.2s ease;
+}
+
+/* Cadre compact : moins de hauteur pour chaque message */
+.message-row .card-body {
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+}
+
+.messages-list .message-row {
+    margin-bottom: 0.35rem;
+}
+
+.admin-empty {
+    padding: 1.5rem 1rem !important;
+}
+
+.admin-empty .empty-icon {
+    font-size: 2rem;
+}
+
+.admin-empty h2 {
+    font-size: 1.05rem;
+    margin-top: 0.5rem;
 }
 
 .message-row:hover {
@@ -81,9 +106,9 @@ body.admin-body {
 }
 
 .avatar-sm {
-    width: 30px;
-    height: 30px;
-    font-size: 0.8rem;
+    width: 26px;
+    height: 26px;
+    font-size: 0.7rem;
 }
 
 .role-badge {
@@ -104,7 +129,7 @@ body.admin-body {
 }
 
 .empty-icon {
-    font-size: 4rem;
+    font-size: 2.6rem;
     color: #a5d6a7;
 }
 
