@@ -45,22 +45,24 @@ body.admin-body {
     margin-bottom: 0.35rem;
 }
 
-/* Etat vide : une simple ligne de texte, sans carte ni bordure */
+/* Etat vide : ligne compacte entouree d'une fine bordure */
 .admin-empty-line {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.4rem;
     margin: 0;
-    padding: 0 0.15rem;
+    padding: 0.3rem 0.65rem;
     max-width: 760px;
-    font-size: 0.78rem;
+    border: 1px solid #e2e8e2;
+    border-radius: 0.35rem;
+    font-size: 0.8rem;
     line-height: 1.3;
-    color: #9aa0a8;
+    color: #8b9199;
 }
 
 .admin-empty-line i {
-    font-size: 0.8rem;
-    color: #b7c0b8;
+    font-size: 0.85rem;
+    color: #a9b5ab;
 }
 
 .message-row:hover {
