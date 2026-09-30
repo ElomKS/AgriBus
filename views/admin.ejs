@@ -56,21 +56,21 @@
             <div class="messages-list">
 
                 <% messages.forEach(function(msg) { %>
-                    <div class="card message-row border-0 shadow-sm rounded-3 mb-1">
-                        <div class="card-body py-1 px-2 d-flex flex-wrap align-items-center gap-2">
+                    <div class="card message-row border-0 shadow-sm rounded-3">
+                        <div class="card-body message-body">
                             <span class="avatar-circle avatar-sm"><%= msg.name.charAt(0).toUpperCase() %></span>
-                            <div class="message-main flex-grow-1 min-w-0">
-                                <div class="d-flex flex-wrap align-items-baseline gap-2">
-                                    <span class="fw-bold small"><%= msg.name %></span>
-                                    <a href="mailto:<%= msg.email %>" class="text-decoration-none message-email"><%= msg.email %></a>
-                                    <small class="text-muted ms-auto text-nowrap">
+                            <div class="message-main">
+                                <div class="message-head">
+                                    <span class="message-name"><%= msg.name %></span>
+                                    <a href="mailto:<%= msg.email %>" class="text-decoration-none message-email text-truncate"><%= msg.email %></a>
+                                    <small class="message-date">
                                         <i class="far fa-clock me-1"></i><%= new Date(msg.created_at.replace(' ', 'T')).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) %>
                                     </small>
                                 </div>
-                                <p class="mb-0 message-text"><%= msg.message %></p>
+                                <p class="message-text"><%= msg.message %></p>
                             </div>
                             <% if (user.role === 'admin') { %>
-                                <form action="/admin/messages/delete" method="POST"
+                                <form class="message-action" action="/admin/messages/delete" method="POST"
                                     onsubmit="return confirm('Supprimer ce message ?')">
                                     <input type="hidden" name="id" value="<%= msg.id %>">
                                     <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle delete-btn"
@@ -79,7 +79,7 @@
                                     </button>
                                 </form>
                             <% } else { %>
-                                <span class="text-muted small" title="Suppression réservée aux administrateurs">
+                                <span class="message-action text-muted small" title="Suppression réservée aux administrateurs">
                                     <i class="fas fa-eye"></i>
                                 </span>
                             <% } %>
