@@ -63,11 +63,13 @@
                                 <div class="message-head">
                                     <span class="message-name"><%= msg.name %></span>
                                     <a href="mailto:<%= msg.email %>" class="text-decoration-none message-email text-truncate"><%= msg.email %></a>
+                                </div>
+                                <div class="message-text-row">
+                                    <p class="message-text"><%= msg.message %></p>
                                     <small class="message-date">
                                         <i class="far fa-clock me-1"></i><%= new Date(msg.created_at.replace(' ', 'T')).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) %>
                                     </small>
                                 </div>
-                                <p class="message-text"><%= msg.message %></p>
                             </div>
                             <% if (user.role === 'admin') { %>
                                 <form class="message-action" action="/admin/messages/delete" method="POST"
