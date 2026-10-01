@@ -283,8 +283,11 @@ body {
 }
 
 /* ============ FOOTER GLOBAL — Kekeli Ferme ============ */
+/* Degrade vertical : evite l'aplat vert uniforme, donne de la profondeur
+   sans rien ajouter en hauteur. */
 .site-footer {
-    background: #1b5e20;
+    background: linear-gradient(180deg, #1f6b26 0%, #1b5e20 55%, #164c1a 100%);
+    box-shadow: inset 0 3px 0 #ffe082;
 }
 
 .footer-brand {
@@ -299,20 +302,33 @@ body {
 }
 
 .footer-desc {
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.78);
     font-size: 0.82rem;
-    line-height: 1.4;
+    line-height: 1.5;
     max-width: 300px;
     margin-bottom: 0.75rem;
+    padding-left: 0.7rem;
+    border-left: 2px solid rgba(255, 224, 130, 0.55);
 }
 
 .footer-heading {
-    font-size: 0.82rem;
-    font-weight: 600;
+    font-size: 0.78rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0.4rem;
+    letter-spacing: 1.2px;
+    margin-bottom: 0.5rem;
     color: #ffe082;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+/* Petit trait decoratif qui prolonge chaque titre de colonne. */
+.footer-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 224, 130, 0.5), transparent);
 }
 
 /* Liens du footer en ligne : la colonne Navigation tient sur 1 ou 2 lignes
@@ -332,7 +348,33 @@ body {
 .footer-links a {
     color: rgba(255, 255, 255, 0.85);
     text-decoration: none;
+    position: relative;
+    padding-bottom: 1px;
     transition: color 0.2s ease;
+}
+
+/* Soulignement qui apparait au survol, via une largeur animee. */
+.footer-links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 1px;
+    width: 0;
+    background: #ffe082;
+    transition: width 0.25s ease;
+}
+
+.footer-links a:hover::after {
+    width: 100%;
+}
+
+.footer-links span {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.footer-links i {
+    color: #a5d6a7;
 }
 
 .footer-links a:hover {
@@ -360,20 +402,33 @@ body {
 }
 
 .footer-bottom {
-    background: rgba(0, 0, 0, 0.18);
+    background: rgba(0, 0, 0, 0.22);
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.72);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Slogan mis en valeur au centre de la barre basse. */
+.footer-tagline {
+    font-style: italic;
+    color: #ffe082;
+    opacity: 0.9;
 }
 
 .footer-admin-link {
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(255, 255, 255, 0.6);
     text-decoration: none;
-    font-size: 0.85rem;
-    transition: color 0.2s ease;
+    font-size: 0.82rem;
+    padding: 0.15rem 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .footer-admin-link:hover {
     color: #ffffff;
+    border-color: #ffe082;
+    background: rgba(255, 224, 130, 0.1);
 }
 
 
