@@ -228,6 +228,50 @@ body.admin-body {
     background-color: #f7fbf7;
 }
 
+/* ---------- COMMANDES ---------- */
+.order-ref {
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.9rem;
+}
+
+/* Une commande non traitee se distingue par un liseré et un fond leger */
+.order-row-new {
+    border-left: 3px solid #dc3545;
+    background-color: #fffafb;
+}
+
+.order-items {
+    font-size: 0.85rem;
+}
+
+.order-status {
+    font-size: 0.7rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.order-status-nouvelle {
+    background: #dc3545;
+    color: #ffffff;
+}
+
+.order-status-traitee {
+    background: #fff3cd;
+    color: #7a5c00;
+    border: 1px solid #ffe08a;
+}
+
+.order-status-livree {
+    background: #2e7d32;
+    color: #ffffff;
+}
+
+.order-status-annulee {
+    background: #e2e8e2;
+    color: #6c757d;
+}
+
 /* ---------- AVIS CLIENTS ---------- */
 .avis-stars {
     display: inline-flex;

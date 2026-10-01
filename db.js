@@ -68,6 +68,7 @@ db.exec(`
     subtotal REAL NOT NULL,
     tax REAL NOT NULL,
     total REAL NOT NULL,
+    status TEXT NOT NULL DEFAULT 'nouvelle' CHECK (status IN ('nouvelle', 'traitee', 'livree', 'annulee')),
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -80,6 +81,15 @@ db.exec(`
     quantity INTEGER NOT NULL
   );
 `);
+
+// Migration : la colonne status a ete ajoutee apres la premiere version de la
+// table orders. CREATE TABLE IF NOT EXISTS ne modifie pas une table existante,
+// il faut donc ALTER TABLE pour les bases creees avant.
+const orderColumns = db.prepare('PRAGMA table_info(orders)').all().map((c) => c.name);
+if (!orderColumns.includes('status')) {
+  db.exec("ALTER TABLE orders ADD COLUMN status TEXT NOT NULL DEFAULT 'nouvelle'");
+  console.log('[KEKELI] Migration appliquee : colonne "status" ajoutee a la table orders.');
+}
 
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -278,6 +288,31 @@ export function getOrderByReference(reference) {
   if (!order) return null;
   const items = db.prepare('SELECT id, product_id, nom, prix, quantity FROM order_items WHERE order_id = ? ORDER BY id').all(order.id);
   return { ...order, items };
+}
+
+export const ORDER_STATUSES = ['nouvelle', 'traitee', 'livree', 'annulee'];
+
+// Commandes de l'admin : les plus recentes d'abord, les nouvelles en tete
+export function listOrders() {
+  return db.prepare(`
+    SELECT * FROM orders
+    ORDER BY CASE status WHEN 'nouvelle' THEN 0 ELSE 1 END, created_at DESC, id DESC
+  `).all();
+}
+
+export function getOrderItems(orderId) {
+  return db.prepare('SELECT nom, prix, quantity FROM order_items WHERE order_id = ? ORDER BY id').all(orderId);
+}
+
+// Nombre de commandes encore a traiter : alimente le badge dans l'admin
+export function countNewOrders() {
+  return db.prepare("SELECT COUNT(*) AS count FROM orders WHERE status = 'nouvelle'").get().count;
+}
+
+export function setOrderStatus(id, status) {
+  if (!ORDER_STATUSES.includes(status)) return false;
+  const info = db.prepare('UPDATE orders SET status = ? WHERE id = ?').run(status, id);
+  return info.changes > 0;
 }
 
 export default db;

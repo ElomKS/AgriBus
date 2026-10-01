@@ -4,10 +4,17 @@ import express from 'express';
 import session from 'express-session';
 import SqliteStore from 'better-sqlite3-session-store';
 import crypto from 'node:crypto';
-import db, { seedProducts, getProducts, addContactMessage, getContactMessages, deleteContactMessage, authenticateUser, createUser, countUsers, getUserByUsername, listUsers, getUserById, countAdmins, changeUserPassword, deleteUser, addReview, getApprovedReviews, getAllReviews, getReviewStats, countPendingReviews, setReviewStatus, deleteReview, createOrder, getOrderByReference } from './db.js';
+import { fileURLToPath } from 'node:url';
+import db, { seedProducts, getProducts, addContactMessage, getContactMessages, deleteContactMessage, authenticateUser, createUser, countUsers, getUserByUsername, listUsers, getUserById, countAdmins, changeUserPassword, deleteUser, addReview, getApprovedReviews, getAllReviews, getReviewStats, countPendingReviews, setReviewStatus, deleteReview, createOrder, getOrderByReference, listOrders, getOrderItems, countNewOrders, setOrderStatus, ORDER_STATUSES } from './db.js';
+import { notifyAdminNewOrder, notifyCustomerOrderConfirmation } from './mailer.js';
 
 export const app = express();
 const isProduction = process.env.NODE_ENV === 'production';
+
+// Vrai seulement quand ce fichier est le point d'entree de Node.
+// Pendant `node --test`, le module est importe : demarrer un serveur ou le
+// store SQLite (intervalle de purge) empecherait la suite de se terminer.
+const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
 
 app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
@@ -34,14 +41,15 @@ const SessionStore = SqliteStore(session);
 
 // Sessions persistees dans SQLite (via better-sqlite3-session-store) :
 // plus de fuite memoire MemoryStore, sessions conservees au redemarrage.
-// En mode test, on garde le MemoryStore par defaut : le store SQLite demarre
-// un intervalle de nettoyage qui empecherait la suite de tests de se terminer.
-const sessionStore = process.env.NODE_ENV === 'test'
-    ? undefined
-    : new SessionStore({
+// Quand le module est importe (suite de tests), on garde le MemoryStore : le
+// store SQLite demarre un intervalle de nettoyage qui empecherait les tests
+// de se terminer.
+const sessionStore = isDirectRun
+    ? new SessionStore({
         client: db,
         expired: { clear: true, intervalMs: 15 * 60 * 1000 } // purge toutes les 15 min
-    });
+    })
+    : undefined;
 
 app.use(session({
     ...(sessionStore ? { store: sessionStore } : {}),
@@ -399,6 +407,12 @@ app.post('/checkout', rateLimit('checkout', {
     req.session.basket = [];
     req.session.total = 0;
 
+    // Notifications email : la commande est deja enregistree, l'envoi part en
+    // arriere-plan et ne peut ni bloquer ni faire echouer la commande.
+    const savedOrder = getOrderByReference(reference);
+    notifyAdminNewOrder(savedOrder);
+    notifyCustomerOrderConfirmation(savedOrder);
+
     res.redirect(`/confirmation/${encodeURIComponent(reference)}`);
 });
 
@@ -545,7 +559,8 @@ app.get('/admin', (req, res) => {
         title: 'Messages - Administration',
         user: req.session.user,
         messages: getContactMessages(),
-        pendingReviews: countPendingReviews()
+        pendingReviews: countPendingReviews(),
+        newOrders: countNewOrders()
     });
 });
 
@@ -567,7 +582,7 @@ app.post('/admin/setup', rateLimit('admin-setup', {
     const info = createUser(username, password, 'admin');
     try {
         await regenerateSession(req, { user: { id: Number(info.lastInsertRowid), username, role: 'admin' } });
-    } catch (err) {
+    } catch {
         return res.status(500).render('error', {
             title: 'Erreur',
             message: 'Erreur lors de la connexion. Réessayez.'
@@ -592,7 +607,7 @@ app.post('/admin/login', rateLimit('admin-login', {
     }
     try {
         await regenerateSession(req, { user: { id: user.id, username: user.username, role: user.role } });
-    } catch (err) {
+    } catch {
         return res.status(500).render('error', {
             title: 'Erreur',
             message: 'Erreur lors de la connexion. Réessayez.'
@@ -711,13 +726,50 @@ app.post('/admin/avis/delete', requireAdmin, (req, res) => {
     res.redirect('/admin/avis');
 });
 
+// ============ ADMIN - Commandes ============
+app.get('/admin/commandes', requireAuth, (req, res) => {
+    // Les articles sont charges par commande pour afficher le recapitulatif
+    // sans multiplier une requete par ligne du tableau.
+    const orders = listOrders().map((order) => ({
+        ...order,
+        items: getOrderItems(order.id)
+    }));
+
+    // Messages flash : lus une seule fois puis retires de la session
+    const orderSuccess = req.session.orderSuccess || '';
+    const orderError = req.session.orderError || '';
+    delete req.session.orderSuccess;
+    delete req.session.orderError;
+
+    res.render('admin-commandes', {
+        title: 'Commandes - Administration',
+        user: req.session.user,
+        orders,
+        statuses: ORDER_STATUSES,
+        orderSuccess,
+        orderError
+    });
+});
+
+app.post('/admin/commandes/statut', requireAdmin, (req, res) => {
+    const id = parseInt(req.body.id, 10);
+    const status = req.body.status;
+
+    if (Number.isInteger(id) && setOrderStatus(id, status)) {
+        req.session.orderSuccess = 'Statut de la commande mis a jour.';
+    } else {
+        req.session.orderError = 'Statut invalide : la commande n a pas ete modifiee.';
+    }
+    res.redirect('/admin/commandes');
+});
+
 app.get('/health', (req, res) => {
     res.set('Cache-Control', 'no-store');
     res.status(200).json({ status: 'ok' });
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
     console.error(err.stack);
     res.status(500).render('error', { 
         title: 'Erreur', 
@@ -734,7 +786,7 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-if (process.env.NODE_ENV !== 'test') {
+if (isDirectRun) {
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`Server running on http://localhost:${PORT}`);
     });

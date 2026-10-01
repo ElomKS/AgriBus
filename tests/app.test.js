@@ -101,6 +101,134 @@ test('an unknown order reference returns 404', async () => {
   assert.equal(response.status, 404);
 });
 
+// Cree une commande de test et renvoie { reference, cookie, token }
+async function placeOrder(nom) {
+  const { cookie, token } = await newSession();
+
+  await fetch(base('/panier/add'), {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded', cookie },
+    body: form({ productId: '1', quantity: '1', csrfToken: token }),
+    redirect: 'manual'
+  });
+
+  const checkout = await fetch(base('/checkout'), {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded', cookie },
+    body: form({
+      nom,
+      email: 'client@test.com',
+      telephone: '+22890000000',
+      adresse: 'Avagome, Togo',
+      deliveryMethod: 'home',
+      paymentMethod: 'cash',
+      csrfToken: token
+    }),
+    redirect: 'manual'
+  });
+
+  const reference = checkout.headers.get('location').split('/').pop();
+  return { reference, cookie, token };
+}
+
+test('/admin/commandes est reserve a un utilisateur connecte', async () => {
+  const response = await fetch(base('/admin/commandes'), { redirect: 'manual' });
+  assert.equal(response.status, 302);
+  assert.match(response.headers.get('location'), /^\/admin/);
+});
+
+test('la commande passee apparait dans l admin et peut changer de statut', async () => {
+  const username = `tmp_cmd_${Date.now()}`;
+  const password = 'MdpTest123!';
+  createUser(username, password, 'admin');
+
+  try {
+    const { reference } = await placeOrder('Client Admin Test');
+    assert.ok(reference.startsWith('KF-'), 'la commande doit avoir une reference');
+
+    // Connexion en admin
+    const loginPage = await fetch(base('/admin'));
+    const cookie = loginPage.headers.get('set-cookie').split(';')[0];
+    const token = (await loginPage.text()).match(/name="csrfToken" value="([^"]+)"/)[1];
+
+    const login = await fetch(base('/admin/login'), {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded', cookie },
+      body: form({ username, password, csrfToken: token }),
+      redirect: 'manual'
+    });
+    assert.equal(login.status, 302);
+    const adminCookie = login.headers.get('set-cookie').split(';')[0];
+
+    // Le tableau de bord affiche le badge des commandes
+    const dash = await fetch(base('/admin'), { headers: { cookie: adminCookie } });
+    const dashText = await dash.text();
+    assert.match(dashText, /Commandes/);
+    assert.match(dashText, /badge bg-danger/, 'le badge des nouvelles commandes doit etre affiche');
+
+    // La page commandes liste la commande passee
+    const page = await fetch(base('/admin/commandes'), { headers: { cookie: adminCookie } });
+    const text = await page.text();
+    assert.equal(page.status, 200);
+    assert.ok(text.includes(reference), 'la commande doit figurer dans la liste');
+    assert.match(text, /Client Admin Test/);
+
+    // Changement de statut
+    const idMatch = text.match(new RegExp(`name="id" value="(\\d+)"[\\s\\S]*?${reference}`));
+    const orderId = idMatch ? idMatch[1] : text.match(new RegExp(`value="(\\d+)"[^>]*>[\\s\\S]*?${reference}`))?.[1];
+
+    const statusRes = await fetch(base('/admin/commandes/statut'), {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded', cookie: adminCookie },
+      body: form({ id: orderId || '1', status: 'traitee', csrfToken: token }),
+      redirect: 'manual'
+    });
+    assert.equal(statusRes.status, 302);
+
+    const after = await fetch(base('/admin/commandes'), { headers: { cookie: adminCookie } });
+    const afterText = await after.text();
+    assert.ok(afterText.includes(reference));
+  } finally {
+    const u = getUserByUsername(username);
+    if (u) deleteUser(u.id);
+  }
+});
+
+test('un statut de commande invalide est rejete', async () => {
+  const username = `tmp_cmd2_${Date.now()}`;
+  const password = 'MdpTest123!';
+  createUser(username, password, 'admin');
+
+  try {
+    const loginPage = await fetch(base('/admin'));
+    const cookie = loginPage.headers.get('set-cookie').split(';')[0];
+    const token = (await loginPage.text()).match(/name="csrfToken" value="([^"]+)"/)[1];
+
+    const login = await fetch(base('/admin/login'), {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded', cookie },
+      body: form({ username, password, csrfToken: token }),
+      redirect: 'manual'
+    });
+    const adminCookie = login.headers.get('set-cookie').split(';')[0];
+
+    const res = await fetch(base('/admin/commandes/statut'), {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded', cookie: adminCookie },
+      body: form({ id: '1', status: 'statut_bidon', csrfToken: token }),
+      redirect: 'manual'
+    });
+    assert.equal(res.status, 302);
+
+    const page = await fetch(base('/admin/commandes'), { headers: { cookie: adminCookie } });
+    const text = await page.text();
+    assert.match(text, /Statut invalide/, 'un statut hors liste doit etre refuse');
+  } finally {
+    const u = getUserByUsername(username);
+    if (u) deleteUser(u.id);
+  }
+});
+
 test('GET /produits filters products by search query', async () => {
   const response = await fetch(base('/produits?search=tom'));
   const text = await response.text();
