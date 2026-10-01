@@ -4,7 +4,9 @@ import express from 'express';
 import session from 'express-session';
 import SqliteStore from 'better-sqlite3-session-store';
 import crypto from 'node:crypto';
-import db, { seedProducts, getProducts, addContactMessage, getContactMessages, deleteContactMessage, authenticateUser, createUser, countUsers, getUserByUsername, listUsers, getUserById, countAdmins, changeUserPassword, deleteUser, addReview, getApprovedReviews, getAllReviews, getReviewStats, countPendingReviews, setReviewStatus, deleteReview, createOrder, getOrderByReference } from './db.js';
+import { fileURLToPath } from 'node:url';
+import db, { seedProducts, getProducts, addContactMessage, getContactMessages, deleteContactMessage, authenticateUser, createUser, countUsers, getUserByUsername, listUsers, getUserById, countAdmins, changeUserPassword, deleteUser, addReview, getApprovedReviews, getAllReviews, getReviewStats, countPendingReviews, setReviewStatus, deleteReview, createOrder, getOrderByReference, listOrders, getOrderItems, countNewOrders, setOrderStatus, ORDER_STATUSES } from './db.js';
+import { notifyAdminNewOrder, notifyCustomerOrderConfirmation } from './mailer.js';
 
 export const app = express();
 const isProduction = process.env.NODE_ENV === 'production';
@@ -399,6 +401,12 @@ app.post('/checkout', rateLimit('checkout', {
     req.session.basket = [];
     req.session.total = 0;
 
+    // Notifications email : la commande est deja enregistree, l'envoi part en
+    // arriere-plan et ne peut ni bloquer ni faire echouer la commande.
+    const savedOrder = getOrderByReference(reference);
+    notifyAdminNewOrder(savedOrder);
+    notifyCustomerOrderConfirmation(savedOrder);
+
     res.redirect(`/confirmation/${encodeURIComponent(reference)}`);
 });
 
@@ -545,7 +553,8 @@ app.get('/admin', (req, res) => {
         title: 'Messages - Administration',
         user: req.session.user,
         messages: getContactMessages(),
-        pendingReviews: countPendingReviews()
+        pendingReviews: countPendingReviews(),
+        newOrders: countNewOrders()
     });
 });
 
@@ -709,6 +718,43 @@ app.post('/admin/avis/unpublish', requireAdmin, (req, res) => {
 app.post('/admin/avis/delete', requireAdmin, (req, res) => {
     deleteReview(parseInt(req.body.id));
     res.redirect('/admin/avis');
+});
+
+// ============ ADMIN - Commandes ============
+app.get('/admin/commandes', requireAuth, (req, res) => {
+    // Les articles sont charges par commande pour afficher le recapitulatif
+    // sans multiplier une requete par ligne du tableau.
+    const orders = listOrders().map((order) => ({
+        ...order,
+        items: getOrderItems(order.id)
+    }));
+
+    // Messages flash : lus une seule fois puis retires de la session
+    const orderSuccess = req.session.orderSuccess || '';
+    const orderError = req.session.orderError || '';
+    delete req.session.orderSuccess;
+    delete req.session.orderError;
+
+    res.render('admin-commandes', {
+        title: 'Commandes - Administration',
+        user: req.session.user,
+        orders,
+        statuses: ORDER_STATUSES,
+        orderSuccess,
+        orderError
+    });
+});
+
+app.post('/admin/commandes/statut', requireAdmin, (req, res) => {
+    const id = parseInt(req.body.id, 10);
+    const status = req.body.status;
+
+    if (Number.isInteger(id) && setOrderStatus(id, status)) {
+        req.session.orderSuccess = 'Statut de la commande mis a jour.';
+    } else {
+        req.session.orderError = 'Statut invalide : la commande n a pas ete modifiee.';
+    }
+    res.redirect('/admin/commandes');
 });
 
 app.get('/health', (req, res) => {
