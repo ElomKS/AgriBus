@@ -54,6 +54,31 @@ db.exec(`
     status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved')),
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    reference TEXT NOT NULL UNIQUE,
+    nom TEXT NOT NULL,
+    email TEXT NOT NULL,
+    telephone TEXT NOT NULL,
+    adresse TEXT NOT NULL,
+    delivery_method TEXT,
+    payment_method TEXT,
+    instructions TEXT,
+    subtotal REAL NOT NULL,
+    tax REAL NOT NULL,
+    total REAL NOT NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS order_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    product_id INTEGER,
+    nom TEXT NOT NULL,
+    prix REAL NOT NULL,
+    quantity INTEGER NOT NULL
+  );
 `);
 
 function hashPassword(password) {
@@ -213,6 +238,46 @@ export function setReviewStatus(id, status) {
 export function deleteReview(id) {
   const stmt = db.prepare('DELETE FROM reviews WHERE id = ?');
   return stmt.run(id);
+}
+
+// ============ COMMANDES ============
+export function createOrder(orderData) {
+  const insertOrder = db.prepare(`
+    INSERT INTO orders (
+      reference, nom, email, telephone, adresse,
+      delivery_method, payment_method, instructions,
+      subtotal, tax, total
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  const insertItem = db.prepare(`
+    INSERT INTO order_items (order_id, product_id, nom, prix, quantity)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+
+  const create = db.transaction((data) => {
+    const info = insertOrder.run(
+      data.reference,
+      data.nom, data.email, data.telephone, data.adresse,
+      data.deliveryMethod || 'home',
+      data.paymentMethod || 'cash',
+      data.instructions || '',
+      data.subtotal, data.tax, data.total
+    );
+    const orderId = Number(info.lastInsertRowid);
+    for (const item of data.items) {
+      insertItem.run(orderId, item.productId || null, item.nom, item.prix, item.quantity);
+    }
+    return orderId;
+  });
+
+  return create(orderData);
+}
+
+export function getOrderByReference(reference) {
+  const order = db.prepare('SELECT * FROM orders WHERE reference = ?').get(reference);
+  if (!order) return null;
+  const items = db.prepare('SELECT id, product_id, nom, prix, quantity FROM order_items WHERE order_id = ? ORDER BY id').all(order.id);
+  return { ...order, items };
 }
 
 export default db;

@@ -65,6 +65,7 @@
                                         </div>
 
                                         <form action="/panier/update" method="POST" class="cart-qty-group">
+                                            <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
                                             <input type="hidden" name="productId" value="<%= item.id %>">
                                             <button type="button" class="cart-qty-btn"
                                                 onclick="updateQuantity(this, -1)">−</button>
@@ -79,6 +80,7 @@
                                         </div>
 
                                         <form action="/panier/remove" method="POST">
+                                            <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
                                             <input type="hidden" name="productId" value="<%= item.id %>">
                                             <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle"
                                                 title="Supprimer" onclick="return confirm('Supprimer cet article ?')">
@@ -89,6 +91,7 @@
                                 <% }); %>
 
                                 <form action="/panier/clear" method="POST" class="mt-4">
+                                    <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
                                     <button type="submit" class="btn btn-outline-secondary btn-sm rounded-pill"
                                         onclick="return confirm('Vider complètement le panier ?')">
                                         <i class="fas fa-broom me-1"></i>Vider le panier

@@ -37,6 +37,7 @@
                 </div>
 
                 <form action="/admin/setup" method="POST" class="text-start">
+                    <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
                     <div class="mb-3">
                         <label for="username" class="form-label fw-semibold">Identifiant admin</label>
                         <input type="text" class="form-control form-control-lg" id="username" name="username"

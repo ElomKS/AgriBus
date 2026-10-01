@@ -74,6 +74,7 @@
                             <% } %>
 
                             <form action="/avis/add" method="POST" class="avis-form">
+                                <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label for="author" class="form-label fw-semibold">Votre nom *</label>
