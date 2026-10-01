@@ -765,7 +765,12 @@ app.post('/admin/commandes/statut', requireAdmin, (req, res) => {
 
 app.get('/health', (req, res) => {
     res.set('Cache-Control', 'no-store');
-    res.status(200).json({ status: 'ok' });
+    res.status(200).json({
+        status: 'ok',
+        // RENDER_GIT_COMMIT est fourni par Render : permet de verifier en un
+        // coup d'oeil quel commit est reellement en production.
+        commit: process.env.RENDER_GIT_COMMIT || 'local'
+    });
 });
 
 // Error handling middleware
