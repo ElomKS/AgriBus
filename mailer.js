@@ -11,22 +11,28 @@
 const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
 const apiKey = process.env.BREVO_API_KEY || '';
-const senderEmail = process.env.MAIL_FROM || '';
+
+// Destinataire par defaut : l'adresse du proprietaire. La variable
+// ADMIN_EMAIL reste prioritaire pour notifier d'autres personnes.
+const DEFAULT_ADMIN_EMAIL = 'komlavi.elom@outlook.com';
+
 const senderName = process.env.MAIL_FROM_NAME || 'Kekeli Ferme';
-const adminEmails = (process.env.ADMIN_EMAIL || '')
+
+// Par defaut on expedite depuis l'adresse du proprietaire : elle doit etre
+// verifiee dans Brevo. MAIL_FROM permet d'utiliser une autre adresse.
+const DEFAULT_SENDER_EMAIL = DEFAULT_ADMIN_EMAIL;
+
+const senderEmail = process.env.MAIL_FROM || DEFAULT_SENDER_EMAIL;
+
+const adminEmails = (process.env.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL)
     .split(',')
     .map((a) => a.trim())
     .filter(Boolean);
 
 if (!apiKey) {
     console.warn('[MAIL] BREVO_API_KEY absent : notifications par email desactivees.');
-} else if (adminEmails.length === 0) {
-    console.warn('[MAIL] ADMIN_EMAIL absent : aucun destinataire pour les notifications de commande.');
 } else {
-    if (!senderEmail) {
-        console.warn('[MAIL] MAIL_FROM absent : les emails ne pourront pas partir.');
-    }
-    console.log(`[MAIL] Notifications Brevo actives vers ${adminEmails.join(', ')}`);
+    console.log(`[MAIL] Notifications Brevo actives vers ${adminEmails.join(', ')} (expediteur : ${senderEmail})`);
 }
 
 // Echappement HTML : les donnees viennent d'un formulaire client, elles doivent
