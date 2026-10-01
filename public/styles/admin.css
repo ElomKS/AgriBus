@@ -26,11 +26,47 @@ body.admin-body {
 
 /* ---------- MESSAGES ---------- */
 .messages-list {
-    max-width: 860px;
+    max-width: 760px;
 }
 
 .message-row {
     transition: box-shadow 0.2s ease;
+}
+
+/* Message : avatar, contenu et action cale sur la premiere ligne */
+.message-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 0.45rem 0.6rem;
+}
+
+.message-body .avatar-sm {
+    margin-top: 0.15rem;
+}
+
+.messages-list .message-row {
+    margin-bottom: 0.35rem;
+}
+
+/* Etat vide : ligne compacte entouree d'une fine bordure */
+.admin-empty-line {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0.3rem 0.65rem;
+    max-width: 760px;
+    border: 1px solid #e2e8e2;
+    border-radius: 0.35rem;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    color: #8b9199;
+}
+
+.admin-empty-line i {
+    font-size: 0.85rem;
+    color: #a9b5ab;
 }
 
 .message-row:hover {
@@ -38,12 +74,66 @@ body.admin-body {
 }
 
 .message-main {
+    flex: 1 1 auto;
     min-width: 0;
+}
+
+/* En-tete : nom et email, jamais de retour a la ligne */
+.message-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    min-width: 0;
+    line-height: 1.3;
+}
+
+/* Deuxieme ligne : texte du message a gauche, date a droite */
+.message-text-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-top: 0.1rem;
+    min-width: 0;
+}
+
+.message-name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #2c3e50;
+    white-space: nowrap;
+}
+
+.message-date {
+    margin-left: auto;
+    font-size: 0.72rem;
+    color: #9aa0a8;
+    white-space: nowrap;
+}
+
+.message-action {
+    display: flex;
+    align-self: flex-start;
+    margin-top: 0.1rem;
+    flex: 0 0 auto;
+}
+
+/* Tres petit ecran : la date passe sous le texte */
+@media (max-width: 480px) {
+    .message-text-row {
+        flex-wrap: wrap;
+    }
+
+    .message-date {
+        flex-basis: 100%;
+        margin-left: 0;
+    }
 }
 
 .message-email {
     font-size: 0.78rem;
     color: #2e7d32;
+    flex: 0 1 auto;
+    min-width: 0;
 }
 
 .message-email:hover {
@@ -53,7 +143,11 @@ body.admin-body {
 
 .message-text {
     font-size: 0.82rem;
+    line-height: 1.35;
     color: #555555;
+    margin: 0;
+    flex: 1 1 auto;
+    min-width: 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -61,9 +155,13 @@ body.admin-body {
 }
 
 .delete-btn {
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
     padding: 0;
+    font-size: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
 }
 
@@ -81,9 +179,9 @@ body.admin-body {
 }
 
 .avatar-sm {
-    width: 30px;
-    height: 30px;
-    font-size: 0.8rem;
+    width: 26px;
+    height: 26px;
+    font-size: 0.7rem;
 }
 
 .role-badge {
@@ -104,6 +202,39 @@ body.admin-body {
 }
 
 .empty-icon {
-    font-size: 4rem;
+    font-size: 2.6rem;
     color: #a5d6a7;
+}
+
+/* ---------- UTILISATEURS ---------- */
+.users-container {
+    max-width: 1000px;
+}
+
+.users-table th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #888888;
+    font-weight: 600;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.users-table td {
+    font-size: 0.88rem;
+}
+
+.users-table tbody tr:hover {
+    background-color: #f7fbf7;
+}
+
+/* ---------- AVIS CLIENTS ---------- */
+.avis-stars {
+    display: inline-flex;
+    gap: .15rem;
+    color: #f0ad4e;
+}
+
+.avis-stars .far.fa-star {
+    color: #dcdfe3;
 }

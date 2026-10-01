@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/styles/main.css">
     <link rel="stylesheet" href="/styles/order.css">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <%- include('../partials/og') %>
 </head>
 
 <body>
@@ -96,7 +97,9 @@
                         <i class="fas fa-truck-fast fs-3"></i>
                         <div>
                             <strong>Détails de livraison</strong><br>
-                            Votre commande sera livrée dans les 24-48h.
+                            <span class="fw-semibold"><%= order.nom %></span> — <%= order.telephone %><br>
+                            <%= order.adresse %><br>
+                            Paiement : <%= order.payment_method === 'card' ? 'Carte bancaire' : 'À la livraison / retrait' %>
                         </div>
                     </div>
 

@@ -1,9 +1,12 @@
 .env
 node_modules/
 
-# Local SQLite database files
-agribus.db
-agribus.db-journal
+# Local SQLite database files (toutes variantes, y compris sauvegardes)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sauvegarde.db
 *.sqbpro
 
 # Logs and temp files

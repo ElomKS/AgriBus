@@ -1,7 +1,7 @@
-﻿{
-  "name": "agribus",
+{
+  "name": "kekeli-ferme",
   "version": "1.0.0",
-  "description": "Application de boutique en ligne pour produits fermiers avec panier et commande en CFA",
+  "description": "Kekeli Ferme - boutique en ligne de produits fermiers (panier, commande en CFA, contact)",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -11,7 +11,7 @@
     "test": "node --test"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "repository": {
     "type": "git",
@@ -25,9 +25,12 @@
   "homepage": "https://github.com/ElomKS/AgriBus#readme",
   "dependencies": {
     "better-sqlite3": "^13.0.2",
+    "better-sqlite3-session-store": "^0.1.0",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
-    "express-session": "^1.18.2",
+    "express-session": "^1.18.2"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.10"
   }
 }

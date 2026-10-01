@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import path from 'node:path';
+import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
@@ -8,7 +9,15 @@ const __dirname = path.dirname(__filename);
 
 // Sur un hebergeur avec disque persistant (ex: Render), definir DATA_DIR
 // vers le chemin monte (ex: /var/data) pour conserver la base entre les deploiements.
-const dataDir = process.env.DATA_DIR || __dirname;
+// Si le chemin est inaccessible, on replie sur le dossier du projet plutot que de crasher.
+let dataDir = process.env.DATA_DIR || __dirname;
+try {
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.accessSync(dataDir, fs.constants.W_OK);
+} catch (err) {
+    console.warn(`[KEKELI] DATA_DIR "${dataDir}" inaccessible (${err.code}) — repli sur ${__dirname}. Les donnees ne seront pas conservees au redemarrage.`);
+    dataDir = __dirname;
+}
 const db = new Database(path.join(dataDir, 'agribus.db'));
 
 db.exec(`
@@ -35,6 +44,40 @@ db.exec(`
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL CHECK (role IN ('admin', 'staff')),
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    author TEXT NOT NULL,
+    rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved')),
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    reference TEXT NOT NULL UNIQUE,
+    nom TEXT NOT NULL,
+    email TEXT NOT NULL,
+    telephone TEXT NOT NULL,
+    adresse TEXT NOT NULL,
+    delivery_method TEXT,
+    payment_method TEXT,
+    instructions TEXT,
+    subtotal REAL NOT NULL,
+    tax REAL NOT NULL,
+    total REAL NOT NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS order_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    product_id INTEGER,
+    nom TEXT NOT NULL,
+    prix REAL NOT NULL,
+    quantity INTEGER NOT NULL
   );
 `);
 
@@ -108,6 +151,32 @@ export function getUserByUsername(username) {
   return db.prepare('SELECT * FROM users WHERE username = ?').get(username);
 }
 
+export function countUsers() {
+  return db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
+}
+
+export function listUsers() {
+  return db.prepare('SELECT id, username, role, created_at FROM users ORDER BY role, username').all();
+}
+
+export function getUserById(id) {
+  return db.prepare('SELECT id, username, role FROM users WHERE id = ?').get(id);
+}
+
+export function countAdmins() {
+  return db.prepare("SELECT COUNT(*) AS count FROM users WHERE role = 'admin'").get().count;
+}
+
+export function changeUserPassword(id, password) {
+  const stmt = db.prepare('UPDATE users SET password_hash = ? WHERE id = ?');
+  return stmt.run(hashPassword(password), id);
+}
+
+export function deleteUser(id) {
+  const stmt = db.prepare('DELETE FROM users WHERE id = ?');
+  return stmt.run(id);
+}
+
 export function authenticateUser(username, password) {
   const user = getUserByUsername(username);
   if (!user) return null;
@@ -124,6 +193,91 @@ export function createUser(username, password, role = 'staff') {
       role = excluded.role
   `);
   return stmt.run(username, hashPassword(password), role);
+}
+
+// ============ AVIS CLIENTS ============
+export function addReview(author, rating, comment) {
+  const stmt = db.prepare(`
+    INSERT INTO reviews (author, rating, comment, status)
+    VALUES (?, ?, ?, 'pending')
+  `);
+  return stmt.run(author, rating, comment);
+}
+
+export function getApprovedReviews() {
+  return db.prepare("SELECT * FROM reviews WHERE status = 'approved' ORDER BY created_at DESC, id DESC").all();
+}
+
+export function getAllReviews() {
+  return db.prepare(`
+    SELECT * FROM reviews
+    ORDER BY CASE status WHEN 'pending' THEN 0 ELSE 1 END, created_at DESC, id DESC
+  `).all();
+}
+
+export function getReviewStats() {
+  const row = db.prepare(`
+    SELECT COUNT(*) AS count, COALESCE(AVG(rating), 0) AS average
+    FROM reviews WHERE status = 'approved'
+  `).get();
+  return {
+    count: row.count,
+    average: row.average ? Math.round(row.average * 10) / 10 : 0
+  };
+}
+
+export function countPendingReviews() {
+  return db.prepare("SELECT COUNT(*) AS count FROM reviews WHERE status = 'pending'").get().count;
+}
+
+export function setReviewStatus(id, status) {
+  const stmt = db.prepare('UPDATE reviews SET status = ? WHERE id = ?');
+  return stmt.run(status, id);
+}
+
+export function deleteReview(id) {
+  const stmt = db.prepare('DELETE FROM reviews WHERE id = ?');
+  return stmt.run(id);
+}
+
+// ============ COMMANDES ============
+export function createOrder(orderData) {
+  const insertOrder = db.prepare(`
+    INSERT INTO orders (
+      reference, nom, email, telephone, adresse,
+      delivery_method, payment_method, instructions,
+      subtotal, tax, total
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  const insertItem = db.prepare(`
+    INSERT INTO order_items (order_id, product_id, nom, prix, quantity)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+
+  const create = db.transaction((data) => {
+    const info = insertOrder.run(
+      data.reference,
+      data.nom, data.email, data.telephone, data.adresse,
+      data.deliveryMethod || 'home',
+      data.paymentMethod || 'cash',
+      data.instructions || '',
+      data.subtotal, data.tax, data.total
+    );
+    const orderId = Number(info.lastInsertRowid);
+    for (const item of data.items) {
+      insertItem.run(orderId, item.productId || null, item.nom, item.prix, item.quantity);
+    }
+    return orderId;
+  });
+
+  return create(orderData);
+}
+
+export function getOrderByReference(reference) {
+  const order = db.prepare('SELECT * FROM orders WHERE reference = ?').get(reference);
+  if (!order) return null;
+  const items = db.prepare('SELECT id, product_id, nom, prix, quantity FROM order_items WHERE order_id = ? ORDER BY id').all(order.id);
+  return { ...order, items };
 }
 
 export default db;
