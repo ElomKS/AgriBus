@@ -4,6 +4,7 @@ import express from 'express';
 import session from 'express-session';
 import SqliteStore from 'better-sqlite3-session-store';
 import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 import db, { seedProducts, getProducts, addContactMessage, getContactMessages, deleteContactMessage, authenticateUser, createUser, countUsers, getUserByUsername, listUsers, getUserById, countAdmins, changeUserPassword, deleteUser, addReview, getApprovedReviews, getAllReviews, getReviewStats, countPendingReviews, setReviewStatus, deleteReview, createOrder, getOrderByReference } from './db.js';
 
 export const app = express();
@@ -34,14 +35,17 @@ const SessionStore = SqliteStore(session);
 
 // Sessions persistees dans SQLite (via better-sqlite3-session-store) :
 // plus de fuite memoire MemoryStore, sessions conservees au redemarrage.
-// En mode test, on garde le MemoryStore par defaut : le store SQLite demarre
-// un intervalle de nettoyage qui empecherait la suite de tests de se terminer.
-const sessionStore = process.env.NODE_ENV === 'test'
-    ? undefined
-    : new SessionStore({
+// Ce fichier etant importe (et non lance) par les tests, on garde le
+// MemoryStore par defaut : le store SQLite demarre un intervalle de nettoyage
+// qui empecherait la suite de tests de se terminer.
+const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
+
+const sessionStore = isDirectRun
+    ? new SessionStore({
         client: db,
         expired: { clear: true, intervalMs: 15 * 60 * 1000 } // purge toutes les 15 min
-    });
+    })
+    : undefined;
 
 app.use(session({
     ...(sessionStore ? { store: sessionStore } : {}),
@@ -567,7 +571,7 @@ app.post('/admin/setup', rateLimit('admin-setup', {
     const info = createUser(username, password, 'admin');
     try {
         await regenerateSession(req, { user: { id: Number(info.lastInsertRowid), username, role: 'admin' } });
-    } catch (err) {
+    } catch {
         return res.status(500).render('error', {
             title: 'Erreur',
             message: 'Erreur lors de la connexion. Réessayez.'
@@ -592,7 +596,7 @@ app.post('/admin/login', rateLimit('admin-login', {
     }
     try {
         await regenerateSession(req, { user: { id: user.id, username: user.username, role: user.role } });
-    } catch (err) {
+    } catch {
         return res.status(500).render('error', {
             title: 'Erreur',
             message: 'Erreur lors de la connexion. Réessayez.'
@@ -716,8 +720,8 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok' });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
+// Error handling middleware (Express exige les 4 parametres)
+app.use((err, req, res, _next) => {
     console.error(err.stack);
     res.status(500).render('error', { 
         title: 'Erreur', 
@@ -734,7 +738,9 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-if (process.env.NODE_ENV !== 'test') {
+
+// Ecoute uniquement quand ce fichier est lance directement (pas lors des tests)
+if (isDirectRun) {
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`Server running on http://localhost:${PORT}`);
     });
