@@ -300,22 +300,32 @@ body {
 
 .footer-desc {
     color: rgba(255, 255, 255, 0.75);
-    font-size: 0.85rem;
-    line-height: 1.5;
+    font-size: 0.82rem;
+    line-height: 1.4;
     max-width: 300px;
+    margin-bottom: 0.75rem;
 }
 
 .footer-heading {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
     color: #ffe082;
 }
 
+/* Liens du footer en ligne : la colonne Navigation tient sur 1 ou 2 lignes
+   au lieu de 6, ce qui raccourcit nettement la hauteur du pied de page. */
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin-bottom: 0;
+}
+
 .footer-links li {
-    margin-bottom: 0.3rem;
+    margin-bottom: 0;
     color: rgba(255, 255, 255, 0.75);
 }
 
@@ -333,13 +343,13 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.12);
     color: #ffffff;
-    font-size: 0.85rem;
-    margin-right: 0.4rem;
+    font-size: 0.8rem;
+    margin-right: 0.35rem;
     transition: background 0.2s ease, transform 0.2s ease;
 }
 
