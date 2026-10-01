@@ -11,6 +11,11 @@ import { notifyAdminNewOrder, notifyCustomerOrderConfirmation } from './mailer.j
 export const app = express();
 const isProduction = process.env.NODE_ENV === 'production';
 
+// Vrai seulement quand ce fichier est le point d'entree de Node.
+// Pendant `node --test`, le module est importe : demarrer un serveur ou le
+// store SQLite (intervalle de purge) empecherait la suite de se terminer.
+const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
+
 app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
@@ -36,14 +41,15 @@ const SessionStore = SqliteStore(session);
 
 // Sessions persistees dans SQLite (via better-sqlite3-session-store) :
 // plus de fuite memoire MemoryStore, sessions conservees au redemarrage.
-// En mode test, on garde le MemoryStore par defaut : le store SQLite demarre
-// un intervalle de nettoyage qui empecherait la suite de tests de se terminer.
-const sessionStore = process.env.NODE_ENV === 'test'
-    ? undefined
-    : new SessionStore({
+// Quand le module est importe (suite de tests), on garde le MemoryStore : le
+// store SQLite demarre un intervalle de nettoyage qui empecherait les tests
+// de se terminer.
+const sessionStore = isDirectRun
+    ? new SessionStore({
         client: db,
         expired: { clear: true, intervalMs: 15 * 60 * 1000 } // purge toutes les 15 min
-    });
+    })
+    : undefined;
 
 app.use(session({
     ...(sessionStore ? { store: sessionStore } : {}),
@@ -576,7 +582,7 @@ app.post('/admin/setup', rateLimit('admin-setup', {
     const info = createUser(username, password, 'admin');
     try {
         await regenerateSession(req, { user: { id: Number(info.lastInsertRowid), username, role: 'admin' } });
-    } catch (err) {
+    } catch {
         return res.status(500).render('error', {
             title: 'Erreur',
             message: 'Erreur lors de la connexion. Réessayez.'
@@ -601,7 +607,7 @@ app.post('/admin/login', rateLimit('admin-login', {
     }
     try {
         await regenerateSession(req, { user: { id: user.id, username: user.username, role: user.role } });
-    } catch (err) {
+    } catch {
         return res.status(500).render('error', {
             title: 'Erreur',
             message: 'Erreur lors de la connexion. Réessayez.'
@@ -763,7 +769,7 @@ app.get('/health', (req, res) => {
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
     console.error(err.stack);
     res.status(500).render('error', { 
         title: 'Erreur', 
@@ -780,7 +786,7 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-if (process.env.NODE_ENV !== 'test') {
+if (isDirectRun) {
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`Server running on http://localhost:${PORT}`);
     });
