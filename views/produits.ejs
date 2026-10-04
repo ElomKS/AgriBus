@@ -48,7 +48,7 @@
             </svg>
         </section>
 
-        <!-- PRODUITS -->
+<!-- PRODUITS -->
         <section class="container py-5">
             <% if (locals.items && locals.items.length > 0) { %>
                 <p class="text-muted mb-4">
@@ -60,30 +60,23 @@
                     <% } %>
                 </p>
 
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
                     <% locals.items.forEach(function(item) { %>
-                        <div class="col">
-                            <div class="product-card">
-                                <div class="product-img-wrap">
-                                    <img src="<%= item.image %>" alt="<%= item.nom %>">
-                                    <span class="product-price"><%= item.prix.toFixed(2) %> CFA</span>
-                                </div>
-                                <div class="product-body">
-                                    <h3 class="product-name"><%= item.nom %></h3>
-                                    <p class="product-desc"><%= item.description %></p>
-                                    <div class="d-flex justify-content-between align-items-center mt-auto">
-                                        <span class="product-stock">
-                                            <i class="fas fa-check me-1"></i>En stock : <%= item.stock %>
-                                        </span>
-                                        <form action="/panier/add" method="POST">
-                                            <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
-                                            <input type="hidden" name="productId" value="<%= item.id %>">
-                                            <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">
-                                                <i class="fas fa-cart-plus me-1"></i>Ajouter
-                                            </button>
-                                        </form>
-                                    </div>
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100">
+                                <img src="<%= item.image %>" alt="<%= item.nom %>" class="card-img-top" style="height:180px; object-fit:cover;">
+                                <div class="card-body">
+                                    <h5 class="card-title"><%= item.nom %></h5>
+                                    <p class="card-text"><strong><%= formatPrix(item.prix) %> CFA <%= libelleUnite(item.unite) %></strong></p>
+                                    <p class="card-text small"><%= item.description %></p>
+                                    <form action="/panier/add" method="POST">
+                                        <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
+                                        <input type="hidden" name="productId" value="<%= item.id %>">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn btn-success w-100 rounded-pill mt-3">
+                                            <i class="fas fa-cart-plus me-1"></i>Ajouter
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -101,12 +94,9 @@
                 </div>
             <% } %>
         </section>
-
-    </main>
-
-    <%- include('../partials/footer.ejs') %>
+</main>
+<%- include('../partials/footer.ejs') %>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
         crossorigin="anonymous"></script>
 </body>
-
 </html>

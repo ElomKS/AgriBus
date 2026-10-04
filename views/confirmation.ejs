@@ -67,7 +67,7 @@
                                             <tr>
                                                 <td><%= item.nom %></td>
                                                 <td class="text-center"><%= item.quantity %></td>
-                                                <td class="text-end"><%= (item.prix * item.quantity).toFixed(2) %> CFA
+                                                <td class="text-end"><%= formatPrix(item.prix * item.quantity) %> CFA
                                                 </td>
                                             </tr>
                                         <% }); %>
@@ -75,16 +75,16 @@
                                     <tfoot>
                                         <tr>
                                             <td colspan="2" class="text-end text-muted">Sous-total</td>
-                                            <td class="text-end"><%= (order.subtotal || 0).toFixed(2) %> CFA</td>
+                                            <td class="text-end"><%= formatPrix(order.subtotal || 0) %> CFA</td>
                                         </tr>
                                         <tr>
                                             <td colspan="2" class="text-end text-muted">TVA (10%)</td>
-                                            <td class="text-end"><%= (order.tax || 0).toFixed(2) %> CFA</td>
+                                            <td class="text-end"><%= formatPrix(order.tax || 0) %> CFA</td>
                                         </tr>
                                         <tr>
                                             <td colspan="2" class="text-end fw-bold">Total</td>
                                             <td class="text-end fw-bold text-success fs-5">
-                                                <%= (order.total || 0).toFixed(2) %> CFA</td>
+                                                <%= formatPrix(order.total || 0) %> CFA</td>
                                         </tr>
                                     </tfoot>
                                 </table>

@@ -79,7 +79,7 @@
                             <div class="product-card">
                                 <div class="product-img-wrap">
                                     <img src="<%= item.image %>" alt="<%= item.nom %>">
-                                    <span class="product-price"><%= item.prix.toFixed(2) %> CFA</span>
+                                    <span class="product-price"><%= formatPrix(item.prix) %> CFA <%= libelleUnite(item.unite) %></span>
                                 </div>
                                 <div class="product-body">
                                     <h3 class="product-name"><%= item.nom %></h3>

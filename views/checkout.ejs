@@ -178,17 +178,17 @@
                                             <div class="fw-semibold"><%= item.nom %></div>
                                             <small class="text-muted">Quantité : <%= item.quantity %></small>
                                         </div>
-                                        <span class="fw-bold"><%= (item.prix * item.quantity).toFixed(2) %> CFA</span>
+                                        <span class="fw-bold"><%= formatPrix(item.prix * item.quantity) %> CFA</span>
                                     </div>
                                 <% }); %>
 
                                 <div class="totals-line">
                                     <span>Sous-total</span>
-                                    <span><%= cartTotals.subtotal.toFixed(2) %> CFA</span>
+                                    <span><%= formatPrix(cartTotals.subtotal) %> CFA</span>
                                 </div>
                                 <div class="totals-line">
                                     <span>TVA (10%)</span>
-                                    <span><%= cartTotals.tax.toFixed(2) %> CFA</span>
+                                    <span><%= formatPrix(cartTotals.tax) %> CFA</span>
                                 </div>
                                 <div class="totals-line">
                                     <span>Livraison</span>
@@ -197,7 +197,7 @@
                                 <hr>
                                 <div class="totals-total mb-4">
                                     <span>Total</span>
-                                    <span><%= cartTotals.total.toFixed(2) %> CFA</span>
+                                    <span><%= formatPrix(cartTotals.total) %> CFA</span>
                                 </div>
 
                                 <div class="d-grid gap-2">
@@ -248,7 +248,8 @@
 
                     <h6 class="fw-bold">2. Produits et prix</h6>
                     <p>Les produits sont vendus au prix indiqué sur le site, exprimés en francs CFA, TVA (10%)
-                        incluse. Kekeli Ferme se réserve le droit de modifier ses prix à tout moment ; les produits
+                        incluse. Les légumes, le poisson et le poulet sont vendus au kilogramme, les œufs à la
+                        plateau. Kekeli Ferme se réserve le droit de modifier ses prix à tout moment ; les produits
                         sont facturés au tarif en vigueur au moment de la commande.</p>
 
                     <h6 class="fw-bold">3. Commande</h6>
