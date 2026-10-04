@@ -61,7 +61,7 @@
                                         <img src="<%= item.image %>" alt="<%= item.nom %>" class="cart-item-img">
                                         <div class="flex-grow-1">
                                             <h5 class="mb-1 fw-bold"><%= item.nom %></h5>
-                                            <small class="text-muted"><%= item.prix.toFixed(2) %> CFA / unité</small>
+                                            <small class="text-muted"><%= formatPrix(item.prix) %> CFA <%= libelleUnite(item.unite) %></small>
                                         </div>
 
                                         <form action="/panier/update" method="POST" class="cart-qty-group">
@@ -76,7 +76,7 @@
                                         </form>
 
                                         <div class="fw-bold text-success" style="min-width: 110px; text-align: right;">
-                                            <%= (item.prix * item.quantity).toFixed(2) %> CFA
+                                            <%= formatPrix(item.prix * item.quantity) %> CFA
                                         </div>
 
                                         <form action="/panier/remove" method="POST">
@@ -121,16 +121,16 @@
                             <div class="card-body p-4">
                                 <div class="totals-line">
                                     <span>Sous-total</span>
-                                    <span><%= cartTotals.subtotal.toFixed(2) %> CFA</span>
+                                    <span><%= formatPrix(cartTotals.subtotal) %> CFA</span>
                                 </div>
                                 <div class="totals-line">
                                     <span>TVA (10%)</span>
-                                    <span><%= cartTotals.tax.toFixed(2) %> CFA</span>
+                                    <span><%= formatPrix(cartTotals.tax) %> CFA</span>
                                 </div>
                                 <hr>
                                 <div class="totals-total mb-4">
                                     <span>Total</span>
-                                    <span><%= cartTotals.total.toFixed(2) %> CFA</span>
+                                    <span><%= formatPrix(cartTotals.total) %> CFA</span>
                                 </div>
                                 <div class="d-grid gap-2">
                                     <a href="/checkout" class="btn btn-success btn-lg rounded-pill">

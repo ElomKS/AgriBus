@@ -27,7 +27,13 @@ db.exec(`
     prix REAL NOT NULL,
     image TEXT NOT NULL,
     description TEXT NOT NULL,
-    stock INTEGER NOT NULL DEFAULT 0
+    stock INTEGER NOT NULL DEFAULT 0,
+    unite TEXT NOT NULL DEFAULT 'kg'
+  );
+
+  CREATE TABLE IF NOT EXISTS settings (
+    cle TEXT PRIMARY KEY,
+    valeur TEXT
   );
 
   CREATE TABLE IF NOT EXISTS contact_messages (
@@ -108,6 +114,26 @@ export function getProducts() {
   return db.prepare('SELECT * FROM products ORDER BY id').all();
 }
 
+// Tarifs de reference en francs CFA, issus de releves de marche au Togo.
+// Les ceufs se vendent a la plateau, tout le reste au kilo.
+const TARIFS_ACTUELS = [
+  { nom: 'Laitues', prix: 200, unite: 'kg' },
+  { nom: 'Tomates', prix: 992, unite: 'kg' },
+  { nom: 'Betteraves', prix: 1600, unite: 'kg' },
+  { nom: 'Concombres', prix: 1600, unite: 'kg' },
+  { nom: 'Oignons', prix: 2500, unite: 'kg' },
+  { nom: 'Carottes', prix: 1900, unite: 'kg' },
+  { nom: 'Poissons', prix: 1700, unite: 'kg' },
+  { nom: 'Poulets', prix: 4900, unite: 'kg' },
+  { nom: 'Œufs', prix: 2750, unite: 'plateau' }
+];
+
+const productColumns = db.prepare('PRAGMA table_info(products)').all().map((c) => c.name);
+if (!productColumns.includes('unite')) {
+  db.exec("ALTER TABLE products ADD COLUMN unite TEXT NOT NULL DEFAULT 'kg'");
+  console.log('[KEKELI] Migration appliquee : colonne "unite" ajoutee a la table products.');
+}
+
 export function seedProducts() {
   const count = db.prepare('SELECT COUNT(*) AS count FROM products').get().count;
   if (count > 0) {
@@ -115,29 +141,50 @@ export function seedProducts() {
   }
 
   const insert = db.prepare(`
-    INSERT INTO products (nom, prix, image, description, stock)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO products (nom, prix, image, description, stock, unite)
+    VALUES (?, ?, ?, ?, ?, ?)
   `);
 
   const products = [
-    { nom: 'Laitues', prix: 3.50, image: './images/laitue.jpg', description: 'Laitues fraîches cultivées biologiquement', stock: 25 },
-    { nom: 'Tomates', prix: 5.75, image: './images/tomate.png', description: 'Tomates juteuses et savoureuses', stock: 30 },
-    { nom: 'Betteraves', prix: 4.25, image: './images/Beetroot.png', description: 'Betteraves rouges fraîches', stock: 20 },
-    { nom: 'Concombres', prix: 2.80, image: './images/cucumbers.png', description: 'Concombres croquants', stock: 15 },
-    { nom: 'Oignons', prix: 3.20, image: './images/onion.png', description: 'Oignons parfumés de notre terre', stock: 40 },
-    { nom: 'Carottes', prix: 3.75, image: './images/carrotte1.jpeg', description: 'Carottes douces et nutritives', stock: 35 },
-    { nom: 'Poissons', prix: 12.50, image: './images/tilapia.jpg', description: 'Poissons frais d’élevage durable', stock: 8 },
-    { nom: 'Poulets', prix: 15.00, image: './images/volailes.jpg', description: 'Poulets fermiers élevés au grain', stock: 5 },
-    { nom: 'Œufs', prix: 6.25, image: './images/oeuf.jpg', description: 'Œufs frais de nos poules élevées au sol', stock: 50 }
+    { nom: 'Laitues', prix: 200, image: './images/laitue.jpg', description: 'Laitues fraîches cultivées biologiquement', stock: 25, unite: 'kg' },
+    { nom: 'Tomates', prix: 992, image: './images/tomate.png', description: 'Tomates juteuses et savoureuses', stock: 30, unite: 'kg' },
+    { nom: 'Betteraves', prix: 1600, image: './images/Beetroot.png', description: 'Betteraves rouges fraîches', stock: 20, unite: 'kg' },
+    { nom: 'Concombres', prix: 1600, image: './images/cucumbers.png', description: 'Concombres croquants', stock: 15, unite: 'kg' },
+    { nom: 'Oignons', prix: 2500, image: './images/onion.png', description: 'Oignons parfumés de notre terre', stock: 40, unite: 'kg' },
+    { nom: 'Carottes', prix: 1900, image: './images/carrotte1.jpeg', description: 'Carottes douces et nutritives', stock: 35, unite: 'kg' },
+    { nom: 'Poissons', prix: 1700, image: './images/tilapia.jpg', description: 'Poissons frais d’élevage durable', stock: 8, unite: 'kg' },
+    { nom: 'Poulets', prix: 4900, image: './images/volailes.jpg', description: 'Poulets fermiers élevés au grain', stock: 5, unite: 'kg' },
+    { nom: 'Œufs', prix: 2750, image: './images/oeuf.jpg', description: 'Œufs frais de nos poules élevées au sol', stock: 50, unite: 'plateau' }
   ];
 
   const insertMany = db.transaction((rows) => {
     for (const product of rows) {
-      insert.run(product.nom, product.prix, product.image, product.description, product.stock);
+      insert.run(product.nom, product.prix, product.image, product.description, product.stock, product.unite);
     }
   });
 
   insertMany(products);
+}
+
+// Applique les tarifs de marche aux bases deja remplies. Une seule fois, grace au
+// drapeau dans "settings" : sinon chaque redemarrage ecraserait les prix ajustes
+// a la main depuis le catalogue.
+export function updateMarketPrices() {
+  const flag = db.prepare('SELECT valeur FROM settings WHERE cle = ?').get('tarifs_marche');
+  if (flag) {
+    return;
+  }
+
+  const update = db.prepare('UPDATE products SET prix = ?, unite = ? WHERE nom = ?');
+  const applyAll = db.transaction(() => {
+    for (const tarif of TARIFS_ACTUELS) {
+      update.run(tarif.prix, tarif.unite, tarif.nom);
+    }
+    db.prepare('INSERT INTO settings (cle, valeur) VALUES (?, ?)').run('tarifs_marche', new Date().toISOString());
+  });
+
+  applyAll();
+  console.log('[KEKELI] Tarifs de marche mis a jour (francs CFA).');
 }
 
 export function addContactMessage(name, email, message) {

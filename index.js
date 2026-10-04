@@ -5,7 +5,7 @@ import session from 'express-session';
 import SqliteStore from 'better-sqlite3-session-store';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import db, { seedProducts, getProducts, addContactMessage, getContactMessages, deleteContactMessage, authenticateUser, createUser, countUsers, getUserByUsername, listUsers, getUserById, countAdmins, changeUserPassword, deleteUser, addReview, getApprovedReviews, getAllReviews, getReviewStats, countPendingReviews, setReviewStatus, deleteReview, createOrder, getOrderByReference, listOrders, getOrderItems, countNewOrders, setOrderStatus, ORDER_STATUSES } from './db.js';
+import db, { seedProducts, getProducts, addContactMessage, getContactMessages, deleteContactMessage, authenticateUser, createUser, countUsers, getUserByUsername, listUsers, getUserById, countAdmins, changeUserPassword, deleteUser, addReview, getApprovedReviews, getAllReviews, getReviewStats, countPendingReviews, setReviewStatus, deleteReview, createOrder, getOrderByReference, listOrders, getOrderItems, countNewOrders, setOrderStatus, ORDER_STATUSES, updateMarketPrices } from './db.js';
 import { notifyAdminNewOrder, notifyCustomerOrderConfirmation } from './mailer.js';
 
 export const app = express();
@@ -70,11 +70,23 @@ app.use(session({
 // Tout POST doit l'envoyer ; sinon la requete est refusee (403).
 // Un site tiers ne peut pas lire le jeton (politique de meme origine) -> les
 // requetes forgees (CSRF) deviennent impossibles, meme si les cookies sont envoyes.
+// Les prix sont stockes en francs CFA : pas de centimes a afficher. On evite
+// "992.00" au profit de "992", et on rappelle l'unite de vente (kg ou plateau).
+function formatPrix(prix) {
+    return Number.isInteger(prix) ? String(prix) : prix.toFixed(2);
+}
+
+function libelleUnite(unite) {
+    return unite === 'plateau' ? '/ plateau' : '/ kg';
+}
+
 app.use((req, res, next) => {
     if (!req.session.csrfToken) {
         req.session.csrfToken = crypto.randomBytes(24).toString('hex');
     }
     res.locals.csrfToken = req.session.csrfToken;
+    res.locals.formatPrix = formatPrix;
+    res.locals.libelleUnite = libelleUnite;
     next();
 });
 
@@ -182,6 +194,7 @@ app.use((req, res, next) => {
 
 // Ensure DB has initial products, then read products on demand
 seedProducts();
+updateMarketPrices();
 
 // Helper function to initialize cart
 function initializeCart(req) {
@@ -237,6 +250,7 @@ app.get('/', (req, res) => {
     res.render('index', { 
         title: 'Accueil - Ferme Bio', 
         cartCount: cartTotals.totalItems,
+        items: getProducts().slice(0, 8),
         reviewStats: getReviewStats(),
         reviewPreview: getApprovedReviews().slice(0, 3)
     });
