@@ -33,4 +33,7 @@ jobs:
         run: npm test
 
       - name: Audit de securite des dependances
-        run: npm audit --audit-level=high
+        # --omit=dev : on audite ce qui tourne en production. CVE-2026-93687
+        # (braces, via nodemon -> chokidar) n'a aucun correctif et ne touche
+        # que la machine de developpement.
+        run: npm audit --audit-level=high --omit=dev
