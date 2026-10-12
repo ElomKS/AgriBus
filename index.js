@@ -1,4 +1,4 @@
-﻿
+
 // Enhanced index.js with proper pricing and cart functionality
 import express from 'express';
 import session from 'express-session';
