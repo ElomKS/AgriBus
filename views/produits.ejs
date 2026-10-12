@@ -85,12 +85,16 @@
             <% } else { %>
                 <div class="empty-state text-center py-5">
                     <i class="fas fa-basket-shopping"></i>
-                    <h2 class="mt-4">Aucun produit disponible pour le moment</h2>
-                    <p class="text-muted">Essayez une autre recherche ou revenez bientôt, la ferme ne manque jamais
-                        d'idées.</p>
-                    <a href="/produits" class="btn btn-outline-success rounded-pill px-4 mt-2">
-                        Voir tous les produits
-                    </a>
+                    <h2 class="mt-4">Ce produit n'est pas disponible pour le moment</h2>
+                    <p class="text-muted">Contacter le service clientelle.</p>
+                    <div class="d-flex gap-2 justify-content-center flex-wrap">
+                        <a href="/contact" class="btn btn-success rounded-pill px-4 mt-2">
+                            Contacter le service client
+                        </a>
+                        <a href="/produits" class="btn btn-outline-success rounded-pill px-4 mt-2">
+                            Voir tous les produits
+                        </a>
+                    </div>
                 </div>
             <% } %>
         </section>

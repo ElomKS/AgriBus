@@ -5,7 +5,7 @@ import session from 'express-session';
 import SqliteStore from 'better-sqlite3-session-store';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import db, { seedProducts, getProducts, addContactMessage, getContactMessages, deleteContactMessage, authenticateUser, createUser, countUsers, getUserByUsername, listUsers, getUserById, countAdmins, changeUserPassword, deleteUser, addReview, getApprovedReviews, getAllReviews, getReviewStats, countPendingReviews, setReviewStatus, deleteReview, createOrder, getOrderByReference, listOrders, getOrderItems, countNewOrders, setOrderStatus, ORDER_STATUSES, updateMarketPrices } from './db.js';
+import db, { seedProducts, getProducts, getAllProducts, getProductById, createProduct, updateProduct, setProductActive, deleteProduct, addContactMessage, getContactMessages, deleteContactMessage, authenticateUser, createUser, countUsers, getUserByUsername, listUsers, getUserById, countAdmins, changeUserPassword, deleteUser, addReview, getApprovedReviews, getAllReviews, getReviewStats, countPendingReviews, setReviewStatus, deleteReview, createOrder, getOrderByReference, listOrders, getOrderItems, countNewOrders, setOrderStatus, ORDER_STATUSES, updateMarketPrices } from './db.js';
 import { notifyAdminNewOrder, notifyCustomerOrderConfirmation } from './mailer.js';
 
 export const app = express();
@@ -80,6 +80,14 @@ function libelleUnite(unite) {
     return unite === 'plateau' ? '/ plateau' : '/ kg';
 }
 
+// Les chemins d'images sont stockes en relatif (./images/x.jpg). Sur les pages
+// publiques cela se resout bien, mais depuis /admin/produits le prefixe "./"
+// pointerait vers /admin/images. On normalise vers un chemin absolu racine.
+function imageUrl(image) {
+    if (!image) return '';
+    return '/' + String(image).replace(/^\.?\//, '');
+}
+
 app.use((req, res, next) => {
     if (!req.session.csrfToken) {
         req.session.csrfToken = crypto.randomBytes(24).toString('hex');
@@ -87,6 +95,7 @@ app.use((req, res, next) => {
     res.locals.csrfToken = req.session.csrfToken;
     res.locals.formatPrix = formatPrix;
     res.locals.libelleUnite = libelleUnite;
+    res.locals.imageUrl = imageUrl;
     next();
 });
 
@@ -154,6 +163,13 @@ function rateLimit(name, { windowMs, max, message }) {
     };
 }
 
+// Reserve aux tests : reinitialise les fenetres de rate limiting. Les tests
+// d'integration partagent tous la meme IP (127.0.0.1), un test de bruteforce
+// consommerait sinon le quota des tests suivants.
+export function resetRateLimits() {
+    rateLimitWindows.clear();
+}
+
 // ============ EN-TETES DE SECURITE ============
 // Clickjacking (X-Frame-Options), sniffing MIME, fuite du referent,
 // et CSP qui restreint les scripts/styles/objets a une liste blanche.
@@ -209,9 +225,9 @@ function normalizeString(str) {
     let s = String(str).toLowerCase();
     s = s.normalize('NFD').replace(/\p{Diacritic}/gu, '');
     // Replace common ligatures
-    s = s.replace(/Å“/g, 'oe').replace(/Ã¦/g, 'ae');
-    // Remove other non-word characters except spaces
-    s = s.replace(/[^-\u007F]/g, '');
+    s = s.replace(/œ/g, 'oe').replace(/ae/g, 'ae');
+    // Remove any remaining non-word characters, keep letters, digits, spaces, hyphens
+    s = s.replace(/[^a-z0-9\u0020\u002D]/g, '');
     return s;
 }
 
@@ -775,6 +791,110 @@ app.post('/admin/commandes/statut', requireAdmin, (req, res) => {
         req.session.orderError = 'Statut invalide : la commande n a pas ete modifiee.';
     }
     res.redirect('/admin/commandes');
+});
+
+// ============ ADMIN - Gestion des produits ============
+function redirectProducts(req, res, message, isError) {
+    if (message) {
+        if (isError) {
+            req.session.productError = message;
+        } else {
+            req.session.productSuccess = message;
+        }
+    }
+    res.redirect('/admin/produits');
+}
+
+// Extrait et valide les champs du formulaire produit. Retourne { data } ou { error }.
+function parseProductBody(body) {
+    const nom = String(body.nom || '').trim();
+    const prix = Number(body.prix);
+    const stock = Number(body.stock);
+    const unite = String(body.unite || '').trim();
+    const image = String(body.image || '').trim() || './images/og-image.png';
+    const description = String(body.description || '').trim();
+
+    if (nom.length < 2 || nom.length > 60) {
+        return { error: 'Le nom doit faire entre 2 et 60 caractères.' };
+    }
+    if (!Number.isFinite(prix) || prix < 0 || prix > 10000000) {
+        return { error: 'Le prix est invalide (0 à 10 000 000 FCFA).' };
+    }
+    if (!Number.isFinite(stock) || stock < 0 || stock > 1000000) {
+        return { error: 'Le stock est invalide (0 à 1 000 000).' };
+    }
+    if (unite !== 'kg' && unite !== 'plateau') {
+        return { error: "L'unité doit être 'kg' ou 'plateau'." };
+    }
+    const cleanImage = image || './images/placeholder.png';
+    return { data: { nom, prix, image: cleanImage, description, stock: Math.floor(stock), unite } };
+}
+
+app.get('/admin/produits', requireAdmin, (req, res) => {
+    res.render('admin-produits', {
+        title: 'Produits - Administration',
+        user: req.session.user,
+        products: getAllProducts(),
+        error: req.session.productError || null,
+        success: req.session.productSuccess || null
+    });
+    req.session.productError = null;
+    req.session.productSuccess = null;
+});
+
+app.post('/admin/produits/create', requireAdmin, (req, res) => {
+    const parsed = parseProductBody(req.body);
+    if (parsed.error) {
+        return redirectProducts(req, res, parsed.error, true);
+    }
+    const result = createProduct(parsed.data);
+    if (result.changes === 1) {
+        redirectProducts(req, res, `Produit "${parsed.data.nom}" ajouté au catalogue.`);
+    } else {
+        redirectProducts(req, res, 'Impossible d ajouter le produit (erreur en base).', true);
+    }
+});
+
+app.post('/admin/produits/update/:id', requireAdmin, (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const existing = getProductById(id);
+    if (!existing) {
+        return redirectProducts(req, res, 'Ce produit n existe pas (il a peut-être été supprimé).', true);
+    }
+    const parsed = parseProductBody(req.body);
+    if (parsed.error) {
+        return redirectProducts(req, res, parsed.error, true);
+    }
+    const result = updateProduct(id, parsed.data);
+    if (result.changes === 1) {
+        redirectProducts(req, res, `Produit "${parsed.data.nom}" mis à jour.`);
+    } else if (result.changes === 0) {
+        redirectProducts(req, res, `Produit "${parsed.data.nom}" mis à jour (aucun changement noté).`);
+    } else {
+        redirectProducts(req, res, 'Échec de la mise à jour.', true);
+    }
+});
+
+app.post('/admin/produits/toggle/:id', requireAdmin, (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const product = getProductById(id);
+    if (!product) {
+        return redirectProducts(req, res, 'Ce produit n existe pas.', true);
+    }
+    setProductActive(id, product.actif ? 0 : 1);
+    redirectProducts(req, res, product.actif
+        ? `Produit "${product.nom}" masqué du catalogue.`
+        : `Produit "${product.nom}" réactivé dans le catalogue.`);
+});
+
+app.post('/admin/produits/delete/:id', requireAdmin, (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    const product = getProductById(id);
+    if (!product) {
+        return redirectProducts(req, res, 'Ce produit n existe pas.', true);
+    }
+    deleteProduct(id);
+    redirectProducts(req, res, `Produit "${product.nom}" supprimé définitivement.`);
 });
 
 app.get('/health', (req, res) => {

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { app } from '../index.js';
-import { createUser, deleteUser, getUserByUsername } from '../db.js';
+import { app, resetRateLimits } from '../index.js';
+import { createUser, deleteUser, getUserByUsername, getAllProducts, getProductById, deleteProduct } from '../db.js';
 
 let server;
 let port;
@@ -306,4 +306,150 @@ test('admin login is rate limited after repeated failed attempts', async () => {
   }
   assert.equal(firstStatus, 401, 'les premieres tentatives doivent etre des echecs d\'authentification');
   assert.equal(lastStatus, 429, 'le rate limit doit bloquer apres plusieurs tentatives');
+});
+
+// ============ ADMIN - GESTION DES PRODUITS ============
+
+async function adminSession() {
+  resetRateLimits();
+  const username = `tmp_prod_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+  const password = 'MdpTest123!';
+  createUser(username, password, 'admin');
+
+  const loginPage = await fetch(base('/admin'));
+  const cookie = loginPage.headers.get('set-cookie').split(';')[0];
+  const token = (await loginPage.text()).match(/name="csrfToken" value="([^"]+)"/)[1];
+
+  const login = await fetch(base('/admin/login'), {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded', cookie },
+    body: form({ username, password, csrfToken: token }),
+    redirect: 'manual'
+  });
+  assert.equal(login.status, 302);
+
+  return {
+    cookie: login.headers.get('set-cookie').split(';')[0],
+    token,
+    username
+  };
+}
+
+test('la gestion des produits est reservee aux administrateurs', async () => {
+  const res = await fetch(base('/admin/produits'), { redirect: 'manual' });
+  assert.equal(res.status, 302);
+  assert.match(res.headers.get('location'), /^\/admin/);
+});
+
+test('un administrateur peut ajouter, modifier, masquer puis supprimer un produit', async () => {
+  const admin = await adminSession();
+  const nom = `ProduitTest${Date.now()}`;
+  let productId = null;
+
+  try {
+    // --- Ajout ---
+    const create = await fetch(base('/admin/produits/create'), {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded', cookie: admin.cookie },
+      body: form({
+        nom,
+        prix: '1500',
+        stock: '12',
+        unite: 'kg',
+        image: './images/tomate.png',
+        description: 'Produit de test',
+        csrfToken: admin.token
+      }),
+      redirect: 'manual'
+    });
+    assert.equal(create.status, 302);
+
+    const created = getAllProducts().find((p) => p.nom === nom);
+    assert.ok(created, 'le produit doit exister en base apres creation');
+    assert.equal(created.prix, 1500);
+    assert.equal(created.actif, 1, 'un nouveau produit est actif par defaut');
+    productId = created.id;
+
+    // Il apparait dans le catalogue public
+    const catalogue = await (await fetch(base('/produits'))).text();
+    assert.ok(catalogue.includes(nom), 'le produit actif doit apparaitre dans le catalogue');
+
+    // --- Modification ---
+    const update = await fetch(base(`/admin/produits/update/${productId}`), {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded', cookie: admin.cookie },
+      body: form({
+        nom,
+        prix: '2750',
+        stock: '5',
+        unite: 'plateau',
+        image: './images/tomate.png',
+        description: 'Description modifiee',
+        csrfToken: admin.token
+      }),
+      redirect: 'manual'
+    });
+    assert.equal(update.status, 302);
+    const updated = getProductById(productId);
+    assert.equal(updated.prix, 2750);
+    assert.equal(updated.unite, 'plateau');
+    assert.equal(updated.stock, 5);
+
+    // --- Masquage ---
+    const toggle = await fetch(base(`/admin/produits/toggle/${productId}`), {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded', cookie: admin.cookie },
+      body: form({ csrfToken: admin.token }),
+      redirect: 'manual'
+    });
+    assert.equal(toggle.status, 302);
+    assert.equal(getProductById(productId).actif, 0, 'le produit doit etre masque');
+
+    const catalogueAfter = await (await fetch(base('/produits'))).text();
+    assert.ok(!catalogueAfter.includes(nom), 'un produit masque ne doit plus apparaitre au catalogue');
+
+    // Visible cote admin malgre le masquage
+    const adminPage = await (await fetch(base('/admin/produits'), { headers: { cookie: admin.cookie } })).text();
+    assert.ok(adminPage.includes(nom), 'un produit masque reste visible dans l administration');
+
+    // --- Suppression ---
+    const del = await fetch(base(`/admin/produits/delete/${productId}`), {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded', cookie: admin.cookie },
+      body: form({ csrfToken: admin.token }),
+      redirect: 'manual'
+    });
+    assert.equal(del.status, 302);
+    assert.equal(getProductById(productId), undefined, 'le produit doit etre supprime');
+    productId = null;
+  } finally {
+    if (productId) deleteProduct(productId);
+    const u = getUserByUsername(admin.username);
+    if (u) deleteUser(u.id);
+  }
+});
+
+test('une creation de produit invalide est refusee (prix negatif)', async () => {
+  const admin = await adminSession();
+  try {
+    const create = await fetch(base('/admin/produits/create'), {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded', cookie: admin.cookie },
+      body: form({
+        nom: 'ProduitInvalide',
+        prix: '-10',
+        stock: '1',
+        unite: 'kg',
+        image: './images/tomate.png',
+        description: 'invalide',
+        csrfToken: admin.token
+      }),
+      redirect: 'manual'
+    });
+    assert.equal(create.status, 302);
+    assert.equal(getAllProducts().find((p) => p.nom === 'ProduitInvalide'), undefined);
+  } finally {
+    const u = getUserByUsername(admin.username);
+    if (u) deleteUser(u.id);
+  }
 });

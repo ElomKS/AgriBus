@@ -47,6 +47,9 @@
                         <span class="badge bg-danger text-white"><%= newOrders %></span>
                     <% } %>
                 </a>
+                <a href="/admin/produits" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                    <i class="fas fa-box me-1"></i>Produits
+                </a>
                 <form action="/admin/logout" method="POST">
                     <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
                     <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">

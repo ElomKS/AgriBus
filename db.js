@@ -28,7 +28,8 @@ db.exec(`
     image TEXT NOT NULL,
     description TEXT NOT NULL,
     stock INTEGER NOT NULL DEFAULT 0,
-    unite TEXT NOT NULL DEFAULT 'kg'
+    unite TEXT NOT NULL DEFAULT 'kg',
+    actif INTEGER NOT NULL DEFAULT 1
   );
 
   CREATE TABLE IF NOT EXISTS settings (
@@ -111,7 +112,42 @@ function verifyPassword(password, stored) {
 }
 
 export function getProducts() {
+  return db.prepare('SELECT * FROM products WHERE actif = 1 ORDER BY id').all();
+}
+
+// Tous les produits, actifs ou non, pour le panneau d'administration.
+export function getAllProducts() {
   return db.prepare('SELECT * FROM products ORDER BY id').all();
+}
+
+export function getProductById(id) {
+  return db.prepare('SELECT * FROM products WHERE id = ?').get(id);
+}
+
+// ============ GESTION DES PRODUITS ============
+export function createProduct({ nom, prix, image, description, stock, unite }) {
+  const stmt = db.prepare(`
+    INSERT INTO products (nom, prix, image, description, stock, unite, actif)
+    VALUES (?, ?, ?, ?, ?, ?, 1)
+  `);
+  return stmt.run(nom, prix, image, description, stock, unite);
+}
+
+export function updateProduct(id, { nom, prix, image, description, stock, unite }) {
+  const stmt = db.prepare(`
+    UPDATE products
+    SET nom = ?, prix = ?, image = ?, description = ?, stock = ?, unite = ?
+    WHERE id = ?
+  `);
+  return stmt.run(nom, prix, image, description, stock, unite, id);
+}
+
+export function setProductActive(id, actif) {
+  return db.prepare('UPDATE products SET actif = ? WHERE id = ?').run(actif ? 1 : 0, id);
+}
+
+export function deleteProduct(id) {
+  return db.prepare('DELETE FROM products WHERE id = ?').run(id);
 }
 
 // Tarifs de reference en francs CFA, issus de releves de marche au Togo.
@@ -132,6 +168,10 @@ const productColumns = db.prepare('PRAGMA table_info(products)').all().map((c) =
 if (!productColumns.includes('unite')) {
   db.exec("ALTER TABLE products ADD COLUMN unite TEXT NOT NULL DEFAULT 'kg'");
   console.log('[KEKELI] Migration appliquee : colonne "unite" ajoutee a la table products.');
+}
+if (!productColumns.includes('actif')) {
+  db.exec('ALTER TABLE products ADD COLUMN actif INTEGER NOT NULL DEFAULT 1');
+  console.log('[KEKELI] Migration appliquee : colonne "actif" ajoutee a la table products.');
 }
 
 export function seedProducts() {

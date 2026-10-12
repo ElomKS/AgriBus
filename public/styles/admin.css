@@ -282,3 +282,42 @@ body.admin-body {
 .avis-stars .far.fa-star {
     color: #dcdfe3;
 }
+
+/* ---------- PRODUITS ---------- */
+.products-container {
+    max-width: 1100px;
+}
+
+.product-admin-row {
+    transition: box-shadow 0.2s ease;
+}
+
+.product-admin-row:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Produit masqué : discret mais repérable d'un coup d'oeil */
+.product-admin-inactive {
+    opacity: 0.62;
+    background-color: #f5f6f5;
+}
+
+.product-admin-thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #eef1ee;
+}
+
+.toggle-btn,
+.product-admin-row .delete-btn,
+.product-admin-row .toggle-btn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
