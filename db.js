@@ -150,6 +150,33 @@ export function deleteProduct(id) {
   return db.prepare('DELETE FROM products WHERE id = ?').run(id);
 }
 
+const IMAGE_FIXES = [
+  ['laitue.jpg', 'laitue.avif'],
+  ['tomate.png', 'tomate.avif'],
+  ['Beetroot.png', 'Beetroot.avif'],
+  ['cucumbers.png', 'cucumbers.avif'],
+  ['onion.png', 'onions.avif'],
+  ['carrotte1.jpeg', 'carrotte1.avif'],
+  ['tilapia.jpg', 'tilapia.avif'],
+  ['volailes.jpg', 'volailes.avif'],
+  ['oeuf.jpg', 'oeuf.avif']
+];
+
+export function normalizeImagePaths() {
+  const update = db.prepare('UPDATE products SET image = ? WHERE image = ?');
+  let changes = 0;
+  const apply = db.transaction(() => {
+    for (const [oldImg, newImg] of IMAGE_FIXES) {
+      const res = update.run(`./images/${newImg}`, `./images/${oldImg}`);
+      changes += res.changes;
+    }
+  });
+  apply();
+  if (changes > 0) {
+    console.log(`[KEKELI] ${changes} chemin(s) d'image corrigé(s) vers AVIF/WebP.`);
+  }
+}
+
 // Tarifs de reference en francs CFA, issus de releves de marche au Togo.
 // Les ceufs se vendent a la plateau, tout le reste au kilo.
 const TARIFS_ACTUELS = [
@@ -226,6 +253,7 @@ export function updateMarketPrices() {
   applyAll();
   console.log('[KEKELI] Tarifs de marche mis a jour (francs CFA).');
 }
+normalizeImagePaths();
 
 export function addContactMessage(name, email, message) {
   const stmt = db.prepare(`

@@ -5,7 +5,7 @@ import session from 'express-session';
 import SqliteStore from 'better-sqlite3-session-store';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import db, { seedProducts, getProducts, getAllProducts, getProductById, createProduct, updateProduct, setProductActive, deleteProduct, addContactMessage, getContactMessages, deleteContactMessage, authenticateUser, createUser, countUsers, getUserByUsername, listUsers, getUserById, countAdmins, changeUserPassword, deleteUser, addReview, getApprovedReviews, getAllReviews, getReviewStats, countPendingReviews, setReviewStatus, deleteReview, createOrder, getOrderByReference, listOrders, getOrderItems, countNewOrders, setOrderStatus, ORDER_STATUSES, updateMarketPrices } from './db.js';
+import db, { seedProducts, getProducts, getAllProducts, getProductById, createProduct, updateProduct, setProductActive, deleteProduct, addContactMessage, getContactMessages, deleteContactMessage, authenticateUser, createUser, countUsers, getUserByUsername, listUsers, getUserById, countAdmins, changeUserPassword, deleteUser, addReview, getApprovedReviews, getAllReviews, getReviewStats, countPendingReviews, setReviewStatus, deleteReview, createOrder, getOrderByReference, listOrders, getOrderItems, countNewOrders, setOrderStatus, ORDER_STATUSES, updateMarketPrices, normalizeImagePaths } from './db.js';
 import { notifyAdminNewOrder, notifyCustomerOrderConfirmation } from './mailer.js';
 
 export const app = express();
@@ -211,6 +211,7 @@ app.use((req, res, next) => {
 // Ensure DB has initial products, then read products on demand
 seedProducts();
 updateMarketPrices();
+normalizeImagePaths();
 
 // Helper function to initialize cart
 function initializeCart(req) {
