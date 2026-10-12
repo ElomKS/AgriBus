@@ -4,8 +4,12 @@ import express from 'express';
 import session from 'express-session';
 import SqliteStore from 'better-sqlite3-session-store';
 import crypto from 'node:crypto';
+import path from 'node:path';
+import fs from 'node:fs';
+import multer from 'multer';
+import sharp from 'sharp';
 import { fileURLToPath } from 'node:url';
-import db, { seedProducts, getProducts, getAllProducts, getProductById, createProduct, updateProduct, setProductActive, deleteProduct, addContactMessage, getContactMessages, deleteContactMessage, authenticateUser, createUser, countUsers, getUserByUsername, listUsers, getUserById, countAdmins, changeUserPassword, deleteUser, addReview, getApprovedReviews, getAllReviews, getReviewStats, countPendingReviews, setReviewStatus, deleteReview, createOrder, getOrderByReference, listOrders, getOrderItems, countNewOrders, setOrderStatus, ORDER_STATUSES, updateMarketPrices, normalizeImagePaths } from './db.js';
+import db, { seedProducts, getProducts, getAllProducts, getProductById, createProduct, updateProduct, setProductActive, deleteProduct, addContactMessage, getContactMessages, deleteContactMessage, authenticateUser, createUser, countUsers, getUserByUsername, listUsers, getUserById, countAdmins, changeUserPassword, deleteUser, addReview, getApprovedReviews, getAllReviews, getReviewStats, countPendingReviews, setReviewStatus, deleteReview, createOrder, getOrderByReference, listOrders, getOrderItems, countNewOrders, setOrderStatus, ORDER_STATUSES, updateMarketPrices, normalizeImagePaths, dataDir } from './db.js';
 import { notifyAdminNewOrder, notifyCustomerOrderConfirmation } from './mailer.js';
 
 export const app = express();
@@ -21,6 +25,23 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // Added for API endpoints
+
+// Dossier des images televersees depuis l'admin. Stocke sur le disque
+// persistant (DATA_DIR) quand il est disponible pour survivre aux redeploiements.
+const uploadsDir = path.join(dataDir, 'uploads');
+fs.mkdirSync(uploadsDir, { recursive: true });
+app.use('/uploads', express.static(uploadsDir, { maxAge: '7d', immutable: true }));
+
+// Analyse des formulaires multipart (upload d'image produit) AVANT la
+// protection CSRF, afin que req.body.csrfToken soit deja disponible.
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+    fileFilter: (req, file, cb) => {
+        if (/^image\//.test(file.mimetype)) return cb(null, true);
+        cb(new Error('Seules les images sont acceptees.'));
+    }
+});
 // Le secret de session signe les cookies (HMAC) et verrouille le panier.
 // En production, on REFUSE de demarrer sans SESSION_SECRET :
 // son fallback en dur rendait la signature forgeable (session fixation -> admin).
@@ -88,6 +109,28 @@ function imageUrl(image) {
     return '/' + String(image).replace(/^\.?\//, '');
 }
 
+function slugify(text) {
+    return String(text)
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 50);
+}
+
+// Convertit l'image televersee en AVIF optimise et l'enregistre sur disque.
+// Retourne le chemin public a stocker en base (ex: /uploads/tomates-ab12cd34.avif).
+async function saveUploadedImage(file, nom) {
+    const base = slugify(nom) || 'produit';
+    const name = `${base}-${crypto.randomBytes(4).toString('hex')}.avif`;
+    await sharp(file.buffer)
+        .rotate()
+        .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
+        .avif({ quality: 55, effort: 4 })
+        .toFile(path.join(uploadsDir, name));
+    return `/uploads/${name}`;
+}
+
 app.use((req, res, next) => {
     if (!req.session.csrfToken) {
         req.session.csrfToken = crypto.randomBytes(24).toString('hex');
@@ -97,6 +140,24 @@ app.use((req, res, next) => {
     res.locals.libelleUnite = libelleUnite;
     res.locals.imageUrl = imageUrl;
     next();
+});
+
+// Analyse des formulaires multipart (upload d'image produit) avant la
+// protection CSRF, pour que req.body.csrfToken soit deja disponible.
+app.use(upload.single('imageFile'));
+
+// Erreurs d'upload (format non supporte, fichier trop lourd) : message clair.
+app.use((err, req, res, next) => {
+    if (!err) return next();
+    console.error('[KEKELI] Upload refuse:', err.message);
+    if (req.path.startsWith('/admin/produits')) {
+        if (req.session) req.session.productError = 'Image invalide : format non supporte ou fichier trop lourd (max 5 Mo).';
+        return res.redirect('/admin/produits');
+    }
+    res.status(400).render('error', {
+        title: 'Requete refusee',
+        message: 'Fichier invalide.'
+    });
 });
 
 function csrfProtect(req, res, next) {
@@ -807,12 +868,12 @@ function redirectProducts(req, res, message, isError) {
 }
 
 // Extrait et valide les champs du formulaire produit. Retourne { data } ou { error }.
-function parseProductBody(body) {
+function parseProductBody(body, fallbackImage = './images/laitue.avif') {
     const nom = String(body.nom || '').trim();
     const prix = Number(body.prix);
     const stock = Number(body.stock);
     const unite = String(body.unite || '').trim();
-    const image = String(body.image || '').trim() || './images/og-image.png';
+    const image = String(body.image || '').trim() || fallbackImage;
     const description = String(body.description || '').trim();
 
     if (nom.length < 2 || nom.length > 60) {
@@ -843,8 +904,17 @@ app.get('/admin/produits', requireAdmin, (req, res) => {
     req.session.productSuccess = null;
 });
 
-app.post('/admin/produits/create', requireAdmin, (req, res) => {
-    const parsed = parseProductBody(req.body);
+app.post('/admin/produits/create', requireAdmin, async (req, res) => {
+    const body = { ...req.body };
+    if (req.file) {
+        try {
+            body.image = await saveUploadedImage(req.file, body.nom);
+        } catch (err) {
+            console.error('[KEKELI] Echec conversion image:', err.message);
+            return redirectProducts(req, res, 'Image illisible ou format non supporte.', true);
+        }
+    }
+    const parsed = parseProductBody(body);
     if (parsed.error) {
         return redirectProducts(req, res, parsed.error, true);
     }
@@ -856,13 +926,22 @@ app.post('/admin/produits/create', requireAdmin, (req, res) => {
     }
 });
 
-app.post('/admin/produits/update/:id', requireAdmin, (req, res) => {
+app.post('/admin/produits/update/:id', requireAdmin, async (req, res) => {
     const id = parseInt(req.params.id, 10);
     const existing = getProductById(id);
     if (!existing) {
         return redirectProducts(req, res, 'Ce produit n existe pas (il a peut-être été supprimé).', true);
     }
-    const parsed = parseProductBody(req.body);
+    const body = { ...req.body };
+    if (req.file) {
+        try {
+            body.image = await saveUploadedImage(req.file, body.nom);
+        } catch (err) {
+            console.error('[KEKELI] Echec conversion image:', err.message);
+            return redirectProducts(req, res, 'Image illisible ou format non supporte.', true);
+        }
+    }
+    const parsed = parseProductBody(body, existing.image);
     if (parsed.error) {
         return redirectProducts(req, res, parsed.error, true);
     }

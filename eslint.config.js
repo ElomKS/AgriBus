@@ -23,6 +23,9 @@ export default [
                 __dirname: 'readonly',
                 __filename: 'readonly',
                 URLSearchParams: 'readonly',
+                FormData: 'readonly',
+                File: 'readonly',
+                Blob: 'readonly',
             },
         },
         rules: {

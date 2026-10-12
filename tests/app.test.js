@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import sharp from 'sharp';
 import { app, resetRateLimits } from '../index.js';
-import { createUser, deleteUser, getUserByUsername, getAllProducts, getProductById, deleteProduct } from '../db.js';
+import { createUser, deleteUser, getUserByUsername, getAllProducts, getProductById, deleteProduct, dataDir } from '../db.js';
 
 let server;
 let port;
@@ -449,6 +452,57 @@ test('une creation de produit invalide est refusee (prix negatif)', async () => 
     assert.equal(create.status, 302);
     assert.equal(getAllProducts().find((p) => p.nom === 'ProduitInvalide'), undefined);
   } finally {
+    const u = getUserByUsername(admin.username);
+    if (u) deleteUser(u.id);
+  }
+});
+
+test('un admin peut televerser une image produit, convertie automatiquement en AVIF', async () => {
+  const admin = await adminSession();
+  const nom = `ProduitImg${Date.now()}`;
+  const uploadsDir = path.join(dataDir, 'uploads');
+  let productId = null;
+  let imageRel = null;
+
+  try {
+    const jpeg = await sharp({
+      create: { width: 640, height: 480, channels: 3, background: { r: 200, g: 120, b: 60 } }
+    }).jpeg().toBuffer();
+
+    const fd = new FormData();
+    fd.append('csrfToken', admin.token);
+    fd.append('nom', nom);
+    fd.append('prix', '900');
+    fd.append('stock', '3');
+    fd.append('unite', 'kg');
+    fd.append('description', 'Produit avec image televersee');
+    fd.append('imageFile', new File([jpeg], 'photo.jpg', { type: 'image/jpeg' }));
+
+    const create = await fetch(base('/admin/produits/create'), {
+      method: 'POST',
+      headers: { cookie: admin.cookie },
+      body: fd,
+      redirect: 'manual'
+    });
+    assert.equal(create.status, 302);
+
+    const created = getAllProducts().find((p) => p.nom === nom);
+    assert.ok(created, 'le produit doit etre cree');
+    productId = created.id;
+    imageRel = created.image;
+
+    assert.match(created.image, /^\/uploads\/.+\.avif$/, 'l image doit etre stockee dans /uploads en AVIF');
+
+    const file = path.join(uploadsDir, path.basename(created.image));
+    assert.ok(fs.existsSync(file), 'le fichier converti doit exister sur disque');
+    const meta = await sharp(file).metadata();
+    assert.equal(meta.format, 'heif', 'le fichier doit etre un AVIF (conteneur HEIF)');
+
+    const served = await fetch(base(created.image));
+    assert.equal(served.status, 200, 'l image doit etre servie publiquement');
+  } finally {
+    if (productId) deleteProduct(productId);
+    if (imageRel) fs.rmSync(path.join(uploadsDir, path.basename(imageRel)), { force: true });
     const u = getUserByUsername(admin.username);
     if (u) deleteUser(u.id);
   }

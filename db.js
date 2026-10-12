@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 // Sur un hebergeur avec disque persistant (ex: Render), definir DATA_DIR
 // vers le chemin monte (ex: /var/data) pour conserver la base entre les deploiements.
 // Si le chemin est inaccessible, on replie sur le dossier du projet plutot que de crasher.
-let dataDir = process.env.DATA_DIR || __dirname;
+export let dataDir = process.env.DATA_DIR || __dirname;
 try {
     fs.mkdirSync(dataDir, { recursive: true });
     fs.accessSync(dataDir, fs.constants.W_OK);
