@@ -94,7 +94,8 @@
                             <div class="mb-2">
                                 <label for="new-image-file" class="form-label small fw-semibold mb-1">Image (fichier)</label>
                                 <input type="file" class="form-control" id="new-image-file" name="imageFile" accept="image/*">
-                                <div class="form-text">JPG, PNG, WebP ou AVIF. Convertie automatiquement en AVIF.</div>
+                                <div class="form-text">JPG, PNG, WebP ou AVIF. <span class="text-success">Tout sera converti automatiquement en AVIF</span>.</div>
+                                <div class="form-text text-warning d-none" id="new-image-convert-hint"><i class="fas fa-arrow-rotate-right me-1"></i>Ce fichier sera converti en AVIF à l'envoi.</div>
                             </div>
                             <div class="mb-2">
                                 <label for="new-image" class="form-label small fw-semibold mb-1">…ou chemin existant</label>
@@ -195,11 +196,12 @@
                                             </div>
                                             <div class="col-md-9">
                                                 <label for="imagefile-<%= product.id %>" class="form-label small fw-semibold mb-1">Nouvelle image (fichier)</label>
-                                                <input type="file" class="form-control form-control-sm" id="imagefile-<%= product.id %>"
-                                                    name="imageFile" accept="image/*">
+                                                <input type="file" class="form-control form-control-sm image-file-input" id="imagefile-<%= product.id %>"
+                                                    name="imageFile" accept="image/*" data-hint-id="edit-image-convert-hint-<%= product.id %>">
                                                 <input type="text" class="form-control form-control-sm mt-1" id="image-<%= product.id %>"
                                                     name="image" value="<%= product.image %>">
-                                                <div class="form-text">Laisser le chemin tel quel pour garder l'image actuelle.</div>
+                                                <div class="form-text">Laisser le chemin tel quel pour garder l'image actuelle. <span class="text-success">Tout sera converti en AVIF</span>.</div>
+                                                <div class="form-text text-warning d-none" id="edit-image-convert-hint-<%= product.id %>"><i class="fas fa-arrow-rotate-right me-1"></i>Ce fichier sera converti en AVIF à l'envoi.</div>
                                             </div>
                                             <div class="col-12">
                                                 <label for="description-<%= product.id %>" class="form-label small fw-semibold mb-1">Description</label>
@@ -224,6 +226,34 @@
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
         crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('change', function (e) {
+            const input = e.target;
+            if (!(input instanceof HTMLInputElement) || input.type !== 'file' || !input.classList.contains('image-file-input') && input.name !== 'imageFile') {
+                return;
+            }
+            const hintId = input.getAttribute('data-hint-id');
+            if (hintId) {
+                const hint = document.getElementById(hintId);
+                if (hint) {
+                    if (input.files && input.files.length > 0) {
+                        hint.classList.remove('d-none');
+                    } else {
+                        hint.classList.add('d-none');
+                    }
+                }
+                return;
+            }
+            const hint = document.getElementById('new-image-convert-hint');
+            if (hint) {
+                if (input.files && input.files.length > 0) {
+                    hint.classList.remove('d-none');
+                } else {
+                    hint.classList.add('d-none');
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -120,15 +120,84 @@ function slugify(text) {
 
 // Convertit l'image televersee en AVIF optimise et l'enregistre sur disque.
 // Retourne le chemin public a stocker en base (ex: /uploads/tomates-ab12cd34.avif).
+// Toujours convertie en AVIF, quel que soit le format d'origine.
 async function saveUploadedImage(file, nom) {
     const base = slugify(nom) || 'produit';
     const name = `${base}-${crypto.randomBytes(4).toString('hex')}.avif`;
-    await sharp(file.buffer)
-        .rotate()
-        .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
-        .avif({ quality: 55, effort: 4 })
-        .toFile(path.join(uploadsDir, name));
+    try {
+        await sharp(file.buffer, { failOn: 'none' })
+            .rotate()
+            .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
+            .avif({ quality: 55, effort: 4 })
+            .toFile(path.join(uploadsDir, name));
+    } catch (err) {
+        console.error('[KEKELI] Erreur conversion AVIF:', err.message);
+        throw err;
+    }
     return `/uploads/${name}`;
+}
+
+// Force la conversion en AVIF pour toute image fournie depuis l'admin.
+// - Si deja dans /uploads/ et en .avif -> on garde (normalise le slash)
+// - Si pointe vers ./images/xxx.jpg|.jpeg|.png|.webp|... -> on convertit en AVIF dans uploads/
+// - Si deja ./images/xxx.avif -> on normalise en /images/xxx.avif
+async function ensureImageInAvif(imageRef, nom) {
+    if (!imageRef) return imageRef;
+    let s = String(imageRef).trim();
+    if (!s) return s;
+
+    // Déjà servi depuis /uploads/ en AVIF
+    if (s.startsWith('/uploads/')) {
+        if (s.toLowerCase().endsWith('.avif')) return s;
+        // Fallback au cas où : on ne ré-encode pas depuis un upload existant sans source
+        // mais on force au moins l'extension si possible
+        return s;
+    }
+
+    // Images statiques du dossier public/images/
+    if (s.startsWith('./images/') || s.startsWith('/images/')) {
+        s = '/' + s.replace(/^\.?\//, '');
+    }
+
+    if (s.startsWith('/images/')) {
+        const filename = path.basename(s);
+        const ext = path.extname(filename).toLowerCase();
+        if (ext === '.avif') {
+            return s;
+        }
+        if (['.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tif', '.tiff'].includes(ext)) {
+            const src = path.join(process.cwd(), 'public', 'images', filename);
+            if (fs.existsSync(src)) {
+                try {
+                    const base = slugify(nom) || path.parse(filename).name || 'produit';
+                    const name = `${base}-${crypto.randomBytes(4).toString('hex')}.avif`;
+                    await sharp(src)
+                        .rotate()
+                        .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
+                        .avif({ quality: 55, effort: 4 })
+                        .toFile(path.join(uploadsDir, name));
+                    console.log(`[KEKELI] Image statique convertie en AVIF: ${s} -> /uploads/${name}`);
+                    return `/uploads/${name}`;
+                } catch (err) {
+                    console.error('[KEKELI] Echec conversion image statique vers AVIF:', err.message);
+                    // On ne casse pas la requête : on renvoie quand même le chemin saisi
+                    // mais au moins on aura loggé l'erreur clairement
+                    return s;
+                }
+            } else {
+                console.warn(`[KEKELI] Image statique introuvable: ${src}`);
+            }
+        }
+        // Autre extension -> on laisse tel quel (évite de casser)
+        return s;
+    }
+
+    // Chemin relatif autre que ./images/ -> on essaie de normaliser prudemment
+    if (!s.startsWith('http://') && !s.startsWith('https://') && !s.startsWith('/')) {
+        s = './' + s;
+    }
+
+    return s;
 }
 
 app.use((req, res, next) => {
@@ -913,6 +982,13 @@ app.post('/admin/produits/create', requireAdmin, async (req, res) => {
             console.error('[KEKELI] Echec conversion image:', err.message);
             return redirectProducts(req, res, 'Image illisible ou format non supporte.', true);
         }
+    } else if (body.image) {
+        try {
+            body.image = await ensureImageInAvif(body.image, body.nom);
+        } catch (err) {
+            console.error('[KEKELI] Echec conversion image vers AVIF:', err.message);
+            return redirectProducts(req, res, 'Image illisible ou format non supporte.', true);
+        }
     }
     const parsed = parseProductBody(body);
     if (parsed.error) {
@@ -935,9 +1011,16 @@ app.post('/admin/produits/update/:id', requireAdmin, async (req, res) => {
     const body = { ...req.body };
     if (req.file) {
         try {
-            body.image = await saveUploadedImage(req.file, body.nom);
+            body.image = await saveUploadedImage(req.file, body.nom || existing.nom);
         } catch (err) {
             console.error('[KEKELI] Echec conversion image:', err.message);
+            return redirectProducts(req, res, 'Image illisible ou format non supporte.', true);
+        }
+    } else if (body.image) {
+        try {
+            body.image = await ensureImageInAvif(body.image, body.nom || existing.nom);
+        } catch (err) {
+            console.error('[KEKELI] Echec conversion image vers AVIF:', err.message);
             return redirectProducts(req, res, 'Image illisible ou format non supporte.', true);
         }
     }
